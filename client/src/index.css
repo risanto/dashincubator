@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+a {
+  color: #008de4;
+  text-decoration: none;
+}
+
+p {
+  margin: 0;
+}
+
+input {
+  -webkit-appearance: none;
+  box-shadow: inset 0 0 0 0 #c5dae8;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+input:focus {
+  outline: 0;
+  box-shadow: inset 0 0 0 2px #c5dae8;
+}
+
+select:focus {
+  outline: 0;
+}
+
+*,
+input,
+button {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: local("Inter"), url(./fonts/Inter.ttf) format("truetype");
+}
+
+.ReactModal__Overlay {
+  opacity: 0;
+  transform: translateX(-100px);
+  transition: all 200ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+  transform: translateX(0px);
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+  transform: translateX(-100px);
+}
