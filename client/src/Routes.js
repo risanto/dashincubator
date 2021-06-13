@@ -12,6 +12,7 @@ import {
   ProfileLocationTemplate,
   ActivityLocation,
   DashboardLocation,
+  UserManagementLocation,
 } from "./Locations";
 import ScrollToTop from "./utils/ScrollToTop";
 import useGlobalState from "./state";
@@ -26,6 +27,7 @@ import PaymentsView from "./views/Payments";
 import ProfileView from "./views/Profile";
 import ActivityView from "./views/Activity";
 import DashboardView from "./views/Dashboard";
+import UserManagementView from "./views/UserManagement";
 
 function isAuthMatch(withAuth, loggedInUser, token) {
   if (!withAuth) {
@@ -123,6 +125,12 @@ const routes = [
     exact: true,
     withAuth: true,
     component: DashboardView,
+  },
+  {
+    path: UserManagementLocation,
+    exact: true,
+    withAuth: true,
+    component: UserManagementView,
   },
 ];
 

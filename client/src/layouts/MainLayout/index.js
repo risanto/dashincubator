@@ -255,7 +255,7 @@ export default function MainLayout({ children, style, match }) {
               onClick={() => history.push(DashboardLocation)}
               style={{
                 borderBottom:
-                  match.path === DashboardLocation
+                  match?.path === DashboardLocation
                     ? "4px solid #fff"
                     : "4px solid transparent",
               }}
@@ -279,7 +279,7 @@ export default function MainLayout({ children, style, match }) {
               style={{
                 marginLeft: "32px",
                 borderBottom:
-                  match.path === ActivityLocation
+                  match?.path === ActivityLocation
                     ? "4px solid #fff"
                     : "4px solid transparent",
               }}
@@ -293,7 +293,7 @@ export default function MainLayout({ children, style, match }) {
               style={{
                 marginLeft: "32px",
                 borderBottom:
-                  match.path === PaymentsLocation
+                  match?.path === PaymentsLocation
                     ? "4px solid #fff"
                     : "4px solid transparent",
               }}

@@ -14,6 +14,7 @@ import {
   BountyLocation,
   ConceptLocation,
   ProfileLocation,
+  UserManagementLocation,
 } from "../../Locations";
 import dashLogo from "../../components/images/dashLogo.svg";
 import ActivityItem from "../../components/ActivityItem";
@@ -178,16 +179,30 @@ export default function ProfileView({ match }) {
                 </div>
                 <div>
                   {loggedInUser.username === currentUser.username && (
-                    <div
-                      className={styles.editCTA}
-                      onClick={() => setEditProfile(true)}
-                    >
-                      <img
-                        src={editIcon}
-                        alt="edit"
-                        style={{ marginRight: "4px", width: "14px" }}
-                      />
-                      <div>Edit</div>
+                    <div>
+                      {loggedInUser.isSuperUser && (
+                        <div
+                          onClick={() => history.push(UserManagementLocation)}
+                          className={styles.editCTA}
+                          style={{
+                            marginBottom: "8px",
+                            backgroundColor: "#AD1D73",
+                          }}
+                        >
+                          User management
+                        </div>
+                      )}
+                      <div
+                        className={styles.editCTA}
+                        onClick={() => setEditProfile(true)}
+                      >
+                        <img
+                          src={editIcon}
+                          alt="edit"
+                          style={{ marginRight: "4px", width: "14px" }}
+                        />
+                        <div>Edit Profile</div>
+                      </div>
                     </div>
                   )}
                 </div>

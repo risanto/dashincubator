@@ -30,3 +30,9 @@ export const getAdmins = async () =>
 
 export const getAdminsSimple = async () =>
   dashincubatorRequest("users/admins/simple", RequestTypes.Get);
+
+export const promoteUser = async (id) =>
+  dashincubatorRequest(`users/promote/${id}`, RequestTypes.Put);
+
+export const demoteUser = async (id) =>
+  dashincubatorRequest(`users/demote/${id}`, RequestTypes.Put);

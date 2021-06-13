@@ -116,6 +116,40 @@ router.get(
 );
 
 router.put(
+  "/promote/:id",
+  ...authHandlers(async (req, res) => {
+    if (!req.tokenPayload.isSuperUser) {
+      res.send({ error: "Insufficient permissions" });
+    } else {
+      await usersCollection.findOneAndUpdate(
+        {
+          $or: [{ _id: ObjectId(req.params.id) }, { _id: req.params.id }],
+        },
+        { $set: { isAdmin: true } }
+      );
+      res.send({ message: "success" });
+    }
+  })
+);
+
+router.put(
+  "/demote/:id",
+  ...authHandlers(async (req, res) => {
+    if (!req.tokenPayload.isSuperUser) {
+      res.send({ error: "Insufficient permissions" });
+    } else {
+      await usersCollection.findOneAndUpdate(
+        {
+          $or: [{ _id: ObjectId(req.params.id) }, { _id: req.params.id }],
+        },
+        { $set: { isAdmin: false, isSuperUser: false } }
+      );
+      res.send({ message: "success" });
+    }
+  })
+);
+
+router.put(
   "/:id",
   ...authHandlers(async (req, res) => {
     const newData = { ...req.body };

@@ -28,3 +28,5 @@ export const ProfileLocation = (username) => `/user/${username}`;
 export const ActivityLocation = "/activity";
 
 export const DashboardLocation = "/dashboard";
+
+export const UserManagementLocation = "/user-management";
