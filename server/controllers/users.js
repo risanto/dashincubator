@@ -39,7 +39,13 @@ function getResetPasswordHashCode(user, requestTime) {
   return crypto
     .createHash("sha512")
     .update(user._id.toHexString())
-    .update(user.passwordHash?.buffer || "")
+    .update(
+      user.passwordHash
+        ? user.passwordHash.buffer
+          ? user.passwordHash.buffer
+          : ""
+        : ""
+    )
     .update(requestTime.getTime().toString())
     .digest()
     .toString("hex", 0, 16);
@@ -237,12 +243,12 @@ router.post("/update-password/:id", async (req, res) => {
   const user = await usersCollection.findOne({ _id: ObjectId(req.params.id) });
   if (
     req.body.hashCode !==
-    getResetPasswordHashCode(user, user.requestPasswordResetAt)
+    getResetPasswordHashCode(user, user.requestPasswordResetAt || new Date())
   ) {
-    res.send({ error: "Invalid hash" });
+    res.send({ error: "Invalid hash, please request a new password reset" });
   } else {
     const requestPasswordResetTimeoutAt =
-      user.requestPasswordResetTimeoutAt ??
+      user.requestPasswordResetTimeoutAt ||
       new Date(
         user.requestPasswordResetAt.getTime() + RESET_PASSWORD_DEFAULT_TIMEOUT
       );
@@ -250,7 +256,9 @@ router.post("/update-password/:id", async (req, res) => {
     const timeNow = Date.now();
 
     if (timeNow > requestPasswordResetTimeoutAt.getTime()) {
-      res.send({ error: "Hash is no longer valid" });
+      res.send({
+        error: "Hash is no longer valid, please request a new password reset",
+      });
     } else {
       const passwordHash = new Binary(
         await generatePasswordHash(req.body.password, user._id)

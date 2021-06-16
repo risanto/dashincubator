@@ -131,6 +131,7 @@ export default function ResetPasswordView() {
             <input
               className={styles.input}
               placeholder={"Enter your email"}
+              disabled={success}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => {
@@ -153,7 +154,7 @@ export default function ResetPasswordView() {
                 {loading ? (
                   <CircularProgress style={{ color: "white" }} size={12} />
                 ) : success ? (
-                  `Reset link sent to ${email}`
+                  `Reset link will be sent to ${email} shortly`
                 ) : (
                   "Send reset password email"
                 )}

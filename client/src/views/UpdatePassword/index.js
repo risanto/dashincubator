@@ -117,9 +117,12 @@ export default function UpdatePasswordView({ match }) {
         hashCode,
       });
       const data = await response.json();
-      console.log(data);
       setLoading(false);
-      history.push(RootLocation);
+      if (data.message === "success") {
+        history.push(RootLocation);
+      } else if (data.error) {
+        setError(data.error);
+      }
     }
   };
 
