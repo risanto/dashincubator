@@ -36,3 +36,9 @@ export const promoteUser = async (id) =>
 
 export const demoteUser = async (id) =>
   dashincubatorRequest(`users/demote/${id}`, RequestTypes.Put);
+
+export const resetPassword = async (email) =>
+  dashincubatorRequest(`users/reset-password/${email}`, RequestTypes.Put);
+
+export const updatePassword = async (uid, data) =>
+  dashincubatorRequest(`users/update-password/${uid}`, RequestTypes.Post, data);

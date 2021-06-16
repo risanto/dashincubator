@@ -13,6 +13,7 @@
   "dependencies": {
     "bcrypt": "^5.0.0",
     "cloudinary": "^1.23.0",
+    "computed-types": "^1.7.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",

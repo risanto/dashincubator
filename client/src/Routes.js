@@ -13,6 +13,8 @@ import {
   ActivityLocation,
   DashboardLocation,
   UserManagementLocation,
+  ResetPasswordLocation,
+  UpdatePasswordLocation,
 } from "./Locations";
 import ScrollToTop from "./utils/ScrollToTop";
 import useGlobalState from "./state";
@@ -28,6 +30,8 @@ import ProfileView from "./views/Profile";
 import ActivityView from "./views/Activity";
 import DashboardView from "./views/Dashboard";
 import UserManagementView from "./views/UserManagement";
+import ResetPasswordView from "./views/ResetPassword";
+import UpdatePasswordView from "./views/UpdatePassword";
 
 function isAuthMatch(withAuth, loggedInUser, token) {
   if (!withAuth) {
@@ -131,6 +135,18 @@ const routes = [
     exact: true,
     withAuth: true,
     component: UserManagementView,
+  },
+  {
+    path: ResetPasswordLocation,
+    exact: true,
+    withAuth: false,
+    component: ResetPasswordView,
+  },
+  {
+    path: UpdatePasswordLocation,
+    exact: true,
+    withAuth: false,
+    component: UpdatePasswordView,
   },
 ];
 

@@ -30,3 +30,8 @@ export const ActivityLocation = "/activity";
 export const DashboardLocation = "/dashboard";
 
 export const UserManagementLocation = "/user-management";
+
+export const UpdatePasswordLocation =
+  "/update-password/:uid([0-9a-f]+)-:hashCode([0-9a-f]+)";
+
+export const ResetPasswordLocation = "/reset-password";

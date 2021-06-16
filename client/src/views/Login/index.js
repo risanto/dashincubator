@@ -4,7 +4,7 @@ import { createUser, loginUser } from "../../api/usersApi";
 import useGlobalState from "../../state";
 import dashLogo from "./images/dashLogo.svg";
 import FadeIn from "react-fade-in";
-import { RootLocation } from "../../Locations";
+import { ResetPasswordLocation, RootLocation } from "../../Locations";
 import { useHistory } from "react-router";
 import arrowRight from "./images/arrowRight.svg";
 import { CircularProgress } from "@material-ui/core";
@@ -14,7 +14,7 @@ import { createUseStyles } from "react-jss";
 import { randomColor, usernameIsValid, Breakpoints } from "../../utils/utils";
 import warnIcon from "./images/warn.svg";
 
-function validateEmail(email) {
+export function validateEmail(email) {
   const re =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
@@ -100,6 +100,15 @@ const useStyles = createUseStyles({
   },
   existingAccount: {
     fontSize: "11px",
+  },
+  forgotPassword: {
+    marginTop: "12px",
+    letterSpacing: "0.1em",
+    color: "white",
+    fontSize: "12px",
+    cursor: "pointer",
+    textDecoration: "underline",
+    userSelect: "none",
   },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     content: { maxWidth: "1050px", margin: "auto", padding: "0 88px" },
@@ -363,6 +372,14 @@ export default function LoginView() {
                     </div>
                   )}
                 </div>
+                {loginState && (
+                  <div
+                    className={styles.forgotPassword}
+                    onClick={() => history.push(ResetPasswordLocation)}
+                  >
+                    FORGOT PASSWORD?
+                  </div>
+                )}
                 <div className={styles.CTAContainer}>
                   {!loginState && (
                     <div
