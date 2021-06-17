@@ -106,9 +106,15 @@ export default function ResetPasswordView() {
     } else {
       setLoading(true);
       setError(null);
-      await resetPassword(email);
-      setSuccess(true);
-      setLoading(false);
+      const response = await resetPassword(email);
+      const result = await response.json();
+      if (result.message === "success") {
+        setSuccess(true);
+        setLoading(false);
+      } else if (result.error) {
+        setLoading(false);
+        setError(result.error);
+      }
     }
   };
 

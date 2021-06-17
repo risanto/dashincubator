@@ -206,37 +206,41 @@ router.put(
 
 router.put("/reset-password/:email", async (req, res) => {
   const user = await usersCollection.findOne({ email: req.params.email });
-  const requestTime = new Date();
-  const hash = getResetPasswordHashCode(user, requestTime);
-  const newMailOptions = { ...mailOptions };
-  newMailOptions.subject = `Dash Incubator - Reset Password`;
-  newMailOptions.to = req.params.email;
-  newMailOptions.text = `Click here to reset your password: ${BASE_URL}/update-password/${
-    user._id
-  }-${encodeURIComponent(hash)}`;
-  newMailOptions.html = `Click here to reset your password: ${BASE_URL}/update-password/${
-    user._id
-  }-${encodeURIComponent(hash)}`;
+  if (!user) {
+    res.send({ error: "No user exists with this email" });
+  } else {
+    const requestTime = new Date();
+    const hash = getResetPasswordHashCode(user, requestTime);
+    const newMailOptions = { ...mailOptions };
+    newMailOptions.subject = `Dash Incubator - Reset Password`;
+    newMailOptions.to = req.params.email;
+    newMailOptions.text = `Click here to reset your password: ${BASE_URL}/update-password/${
+      user._id
+    }-${encodeURIComponent(hash)}`;
+    newMailOptions.html = `Click here to reset your password: ${BASE_URL}/update-password/${
+      user._id
+    }-${encodeURIComponent(hash)}`;
 
-  const requestPasswordResetTimeoutAt = new Date(
-    requestTime.getTime() + RESET_PASSWORD_DEFAULT_TIMEOUT
-  );
-  await usersCollection.updateOne(
-    { _id: user._id },
-    {
-      $set: {
-        requestPasswordResetAt: requestTime,
-        requestPasswordResetTimeoutAt,
-      },
-    }
-  );
+    const requestPasswordResetTimeoutAt = new Date(
+      requestTime.getTime() + RESET_PASSWORD_DEFAULT_TIMEOUT
+    );
+    await usersCollection.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          requestPasswordResetAt: requestTime,
+          requestPasswordResetTimeoutAt,
+        },
+      }
+    );
 
-  transporter.sendMail(newMailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-    }
-    res.send({ message: "success" });
-  });
+    transporter.sendMail(newMailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      }
+      res.send({ message: "success" });
+    });
+  }
 });
 
 router.post("/update-password/:id", async (req, res) => {
