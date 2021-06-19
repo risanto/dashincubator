@@ -6,6 +6,7 @@ const { authHandlers } = require("../handlers");
 const router = Router();
 const tasksCollection = getTable("tasks");
 const activityCollection = getTable("activity");
+const bountiesCollection = getTable("bounties");
 const usersCollection = getTable("users");
 const notificationsCollection = getTable("notifications");
 
@@ -35,7 +36,7 @@ router.get(
 router.get(
   "/completed",
   ...authHandlers(async (req, res) => {
-    let items = [];
+    let jobItems = [];
     const jobs = await tasksCollection
       .find({
         bountyType: "job",
@@ -47,9 +48,28 @@ router.get(
         let newJob = { ...jobs[i] };
         delete newJob.reviews;
         delete newJob.completions;
-        items.push({ ...newJob, ...jobs[i].reviews[j] });
+        jobItems.push({ ...newJob, ...jobs[i].reviews[j] });
       }
     }
+
+    const approvedConcepts = await bountiesCollection
+      .find({
+        approvedDate: { $exists: true },
+      })
+      .project({ requests: 0, completions: 0, reviews: 0 })
+      .toArray();
+
+    approvedConcepts.map((item) => {
+      item.bountyTitle = item.title;
+      item.description = "Approved concept";
+      item.approvedAdmin = item.approvedBy;
+      item.taskType = "spec";
+      item.approvedContributor = item.user;
+      item.payout = 0.5;
+      item.isConcept = true;
+      item.isPaid = item.conceptPaid;
+    });
+
     const result = await tasksCollection
       .find({
         status: "complete",
@@ -58,7 +78,7 @@ router.get(
       .toArray();
     const filteredResult = result.filter((item) => item.bountyType !== "job");
     res.send(
-      [...filteredResult, ...items].sort(
+      [...filteredResult, ...jobItems, ...approvedConcepts].sort(
         (a, b) => new Date(b.approvedDate) - new Date(a.approvedDate)
       )
     );
@@ -355,6 +375,59 @@ router.put(
         reviewComments: req.body.approvedComments,
         taskID: ObjectID(task.value._id),
         bountyID: ObjectID(task.value.bountyID),
+        date: new Date(),
+      });
+      res.send({ message: "success" });
+    }
+  })
+);
+
+router.put(
+  "/payout-concept/:id",
+  ...authHandlers(async (req, res) => {
+    if (!req.tokenPayload.isSuperUser) {
+      res.send({ error: "Insufficient permissions" });
+    } else {
+      const concept = await bountiesCollection.findOneAndUpdate(
+        { _id: ObjectID(req.params.id) },
+        { $set: { ...req.body.data, conceptPaid: true } },
+        { returnOriginal: false }
+      );
+      await notificationsCollection.insertOne({
+        notificationLevel: "bounty",
+        notificationType: "payoutConcept",
+        bountyTitle: concept.value.title,
+        bountyType: concept.value.type,
+        bountyDisplayURL: concept.value.displayURL,
+        sourceUser: concept.value.paidOutBy,
+        destinationUser: concept.value.user,
+        payout: 0.5,
+        bountyID: ObjectID(concept.value._id),
+        date: new Date(),
+      });
+      await notificationsCollection.insertOne({
+        notificationLevel: "bounty",
+        notificationType: "payoutConcept",
+        bountyTitle: concept.value.title,
+        bountyType: concept.value.type,
+        bountyDisplayURL: concept.value.displayURL,
+        sourceUser: concept.value.paidOutBy,
+        destinationUser: concept.value.approvedBy,
+        payout: 0.05,
+        bountyID: ObjectID(concept.value._id),
+        date: new Date(),
+      });
+      await activityCollection.insertOne({
+        activityLevel: "bounty",
+        activityType: "payoutConcept",
+        bountyTitle: concept.value.title,
+        bountyType: concept.value.type,
+        bountyDisplayURL: concept.value.displayURL,
+        sourceUser: concept.value.paidOutBy,
+        destinationUser: concept.value.user,
+        destinationUser2: concept.value.approvedBy,
+        payout: 0.5,
+        bountyID: ObjectID(concept.value._id),
         date: new Date(),
       });
       res.send({ message: "success" });

@@ -40,6 +40,7 @@ const useStyles = createUseStyles({
     padding: "0 24px",
     marginTop: "32px",
     color: "#0B0F3B",
+    paddingBottom: "64px",
   },
   header: {
     color: "rgba(255, 255, 255, 0.8)",
@@ -180,6 +181,7 @@ const useStyles = createUseStyles({
       padding: "0 88px",
       marginTop: "32px",
       color: "#0B0F3B",
+      paddingBottom: "64px",
     },
   },
 });
@@ -228,8 +230,8 @@ export default function PaymentsView({ match }) {
       searchTypes.includes(task.taskType) &&
       (searchUsers.length > 0
         ? searchUsers
-            .map((user) => user.username)
-            .includes(task.approvedAdmin.username)
+            .map((user) => user?.username)
+            .includes(task.approvedAdmin?.username)
         : true)
   );
 
