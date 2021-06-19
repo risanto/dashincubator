@@ -2,7 +2,11 @@ import { Button, CircularProgress } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import FadeIn from "react-fade-in";
 import { createUseStyles } from "react-jss";
-import { getBounty } from "../../api/bountiesApi";
+import {
+  commentBounty,
+  getBounty,
+  getBountyActivity,
+} from "../../api/bountiesApi";
 import MainLayout from "../../layouts/MainLayout";
 import moment from "moment";
 import { ProfileLocation } from "../../Locations";
@@ -16,6 +20,8 @@ import RequestNewConceptView from "../RequestNewConcept";
 import ApproveConceptView from "../ApproveConcept";
 import { formatLink, Breakpoints, addHTTPS } from "../../utils/utils";
 import { isMobile } from "react-device-detect";
+import ActivityItem from "../../components/ActivityItem";
+import Textarea from "../../components/Textarea";
 
 const useStyles = createUseStyles({
   container: {
@@ -89,6 +95,22 @@ const useStyles = createUseStyles({
   },
   rightColumn: { marginLeft: "0px", width: "100%" },
   textContainer: { flexShrink: 0, maxWidth: "100%", marginBottom: "16px" },
+  commentCTA: {
+    backgroundColor: "#0B0F3B",
+    display: "block",
+    color: "white",
+    fontSize: "10px",
+    lineHeight: "12px",
+    height: "30px",
+    borderRadius: "4px",
+    padding: "8px",
+    cursor: "pointer",
+    userSelect: "none",
+    fontWeight: 600,
+    marginLeft: "8px",
+    width: "60px",
+    textAlign: "center",
+  },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     textContainer: { flexShrink: 0, maxWidth: "516px", marginBottom: "16px" },
     container: {
@@ -121,8 +143,11 @@ const useStyles = createUseStyles({
 
 export default function ConceptView({ match }) {
   const [concept, setConcept] = useState(null);
+  const [activity, setActivity] = useState([]);
   const [approveModal, setApproveModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
   const styles = useStyles();
   const history = useHistory();
   const { loggedInUser } = useGlobalState();
@@ -131,9 +156,36 @@ export default function ConceptView({ match }) {
     getBounty(match.params.id)
       .then((result) => result.json())
       .then((data) => {
-        setConcept(data);
+        getBountyActivity(data._id)
+          .then((data) => data.json())
+          .then((results) => {
+            setActivity(results);
+            setConcept(data);
+          });
       });
   }, [match.params.id]);
+
+  const onComment = () => {
+    if (comment.length > 0 && comment.length < 5000) {
+      setLoading(true);
+      setComment("");
+      commentBounty &&
+        commentBounty({ comment, commentUser: loggedInUser }, concept._id)
+          .then((data) => data.json())
+          .then(() => {
+            getBountyActivity(concept._id)
+              .then((data) => data.json())
+              .then((results) => {
+                setLoading(false);
+                setActivity(results);
+              });
+          });
+    }
+  };
+
+  const setNewActivity = (results) => {
+    setActivity(results);
+  };
 
   return (
     <MainLayout match={match}>
@@ -310,6 +362,64 @@ export default function ConceptView({ match }) {
                     </a>
                   ))}
                 </div>
+              </div>
+              <div>
+                <div
+                  style={{
+                    marginTop: "24px",
+                  }}
+                  className={styles.header}
+                >
+                  ACTIVITY
+                </div>
+                <div style={{ display: "flex", marginTop: "20px" }}>
+                  <div style={{ marginRight: "8px" }}>
+                    <UserAvatar
+                      size={"18px"}
+                      fontSize={"8px"}
+                      lineHeight={"10px"}
+                      user={loggedInUser}
+                    />
+                  </div>
+                  <div style={{ width: "100%" }}>
+                    <div style={{ display: "flex", alignItems: "flex-end" }}>
+                      <Textarea
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        loading={loading}
+                      />
+                      <div
+                        className={styles.commentCTA}
+                        onClick={() => !loading && onComment()}
+                      >
+                        {loading ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <CircularProgress
+                              style={{ color: "white" }}
+                              size={10}
+                            />
+                          </div>
+                        ) : (
+                          "Submit"
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {activity?.map((item) => (
+                  <ActivityItem
+                    item={item}
+                    global
+                    bounty
+                    setNewActivity={setNewActivity}
+                  />
+                ))}
               </div>
             </div>
           </div>
