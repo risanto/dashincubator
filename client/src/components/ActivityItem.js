@@ -81,6 +81,7 @@ export default function ActivityItem({
   onJobReview,
   task,
   setNewActivity,
+  concept,
 }) {
   const styles = useStyles(global);
   const history = useHistory();
@@ -319,7 +320,11 @@ export default function ActivityItem({
                     {item.activityType === "commentBounty" && bounty
                       ? "this"
                       : "a"}{" "}
-                    {item.activityType === "commentTask" ? "task" : "bounty"}
+                    {concept
+                      ? "concept"
+                      : item.activityType === "commentTask"
+                      ? "task"
+                      : "bounty"}
                   </div>
                 )}
                 {loggedInUser.username === item.sourceUser.username && (

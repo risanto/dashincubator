@@ -418,6 +418,7 @@ export default function ConceptView({ match }) {
                     global
                     bounty
                     setNewActivity={setNewActivity}
+                    concept
                   />
                 ))}
               </div>
