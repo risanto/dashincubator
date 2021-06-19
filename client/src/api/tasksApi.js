@@ -74,5 +74,13 @@ export const payoutTask = (data, taskId) => {
   dashincubatorRequest(`tasks/payout/${taskId}`, RequestTypes.Put, data);
 };
 
+export const payoutConcept = (data, conceptId) => {
+  dashincubatorRequest(
+    `tasks/payout-concept/${conceptId}`,
+    RequestTypes.Put,
+    data
+  );
+};
+
 export const getCompletedTasks = () =>
   dashincubatorRequest(`tasks/completed`, RequestTypes.Get);

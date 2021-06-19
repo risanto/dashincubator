@@ -260,6 +260,24 @@ export default function NotificationItem({ notification }) {
                 DASH 💸
               </div>
             </div>
+          ) : notification.notificationType === "payoutConcept" ? (
+            <div className={styles.contentContainer}>
+              <div
+                style={{ fontWeight: 600, cursor: "pointer" }}
+                onClick={() =>
+                  history.push(
+                    ProfileLocation(notification.sourceUser.username)
+                  )
+                }
+              >
+                {notification.sourceUser.username}
+              </div>
+
+              <div style={{ marginLeft: "4px" }}>
+                just paid you out {parseFloat(notification.payout).toFixed(3)}{" "}
+                DASH 💸
+              </div>
+            </div>
           ) : notification.notificationType === "approveConcept" ? (
             <div className={styles.contentContainer}>
               <div

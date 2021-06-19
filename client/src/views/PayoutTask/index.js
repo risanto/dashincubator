@@ -3,7 +3,7 @@ import { createUseStyles } from "react-jss";
 import DashModal from "../../components/DashModal";
 import doneIcon from "../Concept/images/done.svg";
 import useGlobalState from "../../state";
-import { payoutTask } from "../../api/tasksApi";
+import { payoutConcept, payoutTask } from "../../api/tasksApi";
 import { CircularProgress } from "@material-ui/core";
 import dashLogo from "../../components/images/dashLogo.svg";
 import UserAvatar from "../../components/UserAvatar";
@@ -56,23 +56,42 @@ export default function PayoutTaskView({ open, onClose, task }) {
       setError(true);
     } else {
       setLoading(true);
-      await payoutTask(
-        {
-          data: {
-            contributorTransactionID,
-            adminTransactionID,
-            paidOutBy: loggedInUser,
+      if (task.isConcept) {
+        await payoutConcept(
+          {
+            data: {
+              contributorTransactionID,
+              adminTransactionID,
+              paidOutBy: loggedInUser,
+            },
           },
-          rid: task.rid,
-        },
-        task._id
-      );
-      setLoading(false);
-      onClose(null, {
-        id: task._id,
-        contributorTransactionID,
-        adminTransactionID,
-      });
+          task._id
+        );
+        setLoading(false);
+        onClose(null, {
+          id: task._id,
+          contributorTransactionID,
+          adminTransactionID,
+        });
+      } else {
+        await payoutTask(
+          {
+            data: {
+              contributorTransactionID,
+              adminTransactionID,
+              paidOutBy: loggedInUser,
+            },
+            rid: task.rid,
+          },
+          task._id
+        );
+        setLoading(false);
+        onClose(null, {
+          id: task._id,
+          contributorTransactionID,
+          adminTransactionID,
+        });
+      }
     }
   };
 

@@ -436,6 +436,21 @@ export default function ActivityItem({
               <b>{highlightUsername(item.destinationUser2.username)}</b>
             </div>
           </div>
+        ) : item.activityType === "payoutConcept" ? (
+          <div className={styles.contentContainer}>
+            <div
+              style={{ fontWeight: 600, cursor: "pointer" }}
+              onClick={() =>
+                history.push(ProfileLocation(item.sourceUser.username))
+              }
+            >
+              {highlightUsername(item.sourceUser.username)}
+            </div>
+            <div style={{ marginLeft: "4px" }}>
+              paid out {global ? "a" : "this"} concept submission by{" "}
+              <b>{highlightUsername(item.destinationUser.username)}</b>
+            </div>
+          </div>
         ) : null}
         {global && item.activityLevel === "task" && (
           <div
