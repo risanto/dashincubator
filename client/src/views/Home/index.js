@@ -129,10 +129,11 @@ export default function HomeView({ match }) {
   const [searchingStatus, setSearchingStatus] = useState(false);
   const [searchTypes, setSearchTypes] = useState([]);
   const [searchingTypes, setSearchingTypes] = useState(false);
-  const [bounties, setBounties] = useState([]);
+
+  const [bounties, setBounties] = useState([]); // gonna be changed to tasks
   const [requestModal, setRequestModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState(1);
+  const [tab, setTab] = useState(0);
   const styles = useStyles();
   const catRef = useRef();
   const typeRef = useRef();
@@ -145,7 +146,7 @@ export default function HomeView({ match }) {
     });
   }, []);
 
-  useEffect(() => {
+  useEffect(() => { //change to fetchTasks and combine in one useEffect
     setLoading(true);
     fetchBounties().then((results) => {
       setLoading(false);
@@ -239,8 +240,8 @@ export default function HomeView({ match }) {
                 }}
                 onClick={() => setTab(1)}
               >
-                BOUNTIES
-              </div>
+                OPEN TASKS
+              </div> 
             </div>
           )}
           <div style={{ display: "flex" }}>
@@ -306,7 +307,7 @@ export default function HomeView({ match }) {
                   className={styles.columnHeader}
                   style={{ display: isMobile ? "none" : "block" }}
                 >
-                  BOUNTIES
+                  OPEN TASKS
                 </div>
                 <div className={styles.searchContainer}>
                   <div className={styles.searchIconContainer}>
@@ -318,7 +319,7 @@ export default function HomeView({ match }) {
                     <input
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      placeholder={"Find a bounty"}
+                      placeholder={"Find a task"}
                       className={styles.searchInput}
                     />
                   </div>
@@ -398,7 +399,7 @@ export default function HomeView({ match }) {
                           lineHeight: "15px",
                         }}
                       >
-                        {isMobile ? "Types" : "Filter types"}
+                        Type
                       </div>
                     </div>
                     <div style={{ position: "relative", marginLeft: "20px" }}>
@@ -443,7 +444,7 @@ export default function HomeView({ match }) {
                           ))}
                         </div>
                       )}
-                      <div
+                      {/* <div
                         style={{
                           display: "flex",
                           alignItems: "center",
@@ -472,11 +473,11 @@ export default function HomeView({ match }) {
                         >
                           {isMobile ? "Status" : "Filter status"}
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
-                <div
+                {/* <div
                   style={{
                     marginTop: "16px",
                   }}
@@ -507,7 +508,7 @@ export default function HomeView({ match }) {
                       <BountyCard bounty={bounty} search={search} />
                     ))
                   )}
-                </div>
+                </div> */}
               </div>
             )}
           </div>
