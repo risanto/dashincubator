@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import {
   ActivityLocation,
+  ConceptsLocation,
   DashboardLocation,
   PaymentsLocation,
   ProfileLocation,
@@ -132,6 +133,10 @@ export default function MainLayout({ children, style, match }) {
       });
   }, []);
 
+  const handleConcept = useCallback(() => {
+    history.push(ConceptsLocation);
+  }, [history]);
+
   return (
     <div style={{ backgroundColor: "#008de4", minHeight: "100vh" }}>
       <DashModal open={showNav} onClose={() => setShowNav(false)}>
@@ -167,6 +172,14 @@ export default function MainLayout({ children, style, match }) {
                 0
               </div>
             )}
+          </div>
+          <div
+            className={styles.navItem}
+            style={{ marginTop: "24px" }}
+            onClick={handleConcept}
+          >
+            <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
+            <div className={styles.navTitle}>Concepts</div>
           </div>
           <div
             className={styles.navItem}
@@ -273,6 +286,20 @@ export default function MainLayout({ children, style, match }) {
                   0
                 </div>
               )}
+            </div>
+            <div
+              className={styles.navItem}
+              style={{
+                marginLeft: "32px",
+                borderBottom:
+                  match?.path === ConceptsLocation
+                    ? "4px solid #fff"
+                    : "4px solid transparent",
+              }}
+              onClick={handleConcept}
+            >
+              <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
+              <div className={styles.navTitle}>Concepts</div>
             </div>
             <div
               className={styles.navItem}

@@ -10,6 +10,11 @@ export const fetchConcepts = async () => {
   return response.json();
 };
 
+export const fetchAllConcepts = async () => {
+  const response = await dashincubatorRequest("bounties/concepts/all");
+  return response.json();
+};
+
 export const createBounty = async (bounty) =>
   dashincubatorRequest("bounties/new", RequestTypes.Post, bounty);
 
