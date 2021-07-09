@@ -104,6 +104,13 @@ router.get(
         ],
       })
       .toArray();
+    res.send(result.sort((a, b) => new Date(b.date) - new Date(a.date)));
+  })
+);
+
+router.put(
+  "/comment/:id/last-seen",
+  ...authHandlers(async (req, res) => {
     // Read out comments
     await activityCollection.updateMany(
       {
@@ -114,7 +121,6 @@ router.get(
       },
       { $set: { lastViewedAt: new Date() } }
     );
-    res.send(result.sort((a, b) => new Date(b.date) - new Date(a.date)));
   })
 );
 
