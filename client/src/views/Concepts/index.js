@@ -162,7 +162,7 @@ export default function ConceptsView({ match }) {
       newCategories.push(category);
       setSearchStatus(newCategories);
     }
-  }, []);
+  }, [searchStatus]);
 
   const modifyCreators = useCallback((category) => {
     const newCategories = searchCreators.slice();
@@ -174,7 +174,7 @@ export default function ConceptsView({ match }) {
       newCategories.push(category);
       setSearchCreators(newCategories);
     }
-  }, []);
+  }, [searchCreators]);
 
   const handleRequestModal = useCallback((open) => () => {
     setRequestModal(open);
