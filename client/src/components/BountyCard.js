@@ -5,26 +5,11 @@ import jobIcon from "../views/ApproveConcept/images/job.svg";
 import ReactDOMServer from "react-dom/server";
 import moment from "moment";
 import UserAvatar from "./UserAvatar";
-import { longhandRelative, truncate, Breakpoints } from "../utils/utils";
+import {longhandRelative, truncate, Breakpoints, getHighlightedText} from "../utils/utils";
 import { useHistory } from "react-router";
 import { BountyLocation } from "../Locations";
 import programmeIcon from "../views/ApproveConcept/images/programme.svg";
 import { createUseStyles } from "react-jss";
-
-const getHighlightedText = (text, highlight) => {
-  const parts = text.split(new RegExp(`(${highlight})`, "gi"));
-  return (
-    <span>
-      {parts.map((part) =>
-        part.toLowerCase() === highlight.toLowerCase() ? (
-          <span style={{ backgroundColor: "#eaf194" }}>{part}</span>
-        ) : (
-          part
-        )
-      )}
-    </span>
-  );
-};
 
 const useStyles = createUseStyles({
   container: {

@@ -317,7 +317,7 @@ export default function ConceptsView({ match }) {
             </div>
           ) : (
             filteredConcepts.map((concept, index) => (
-              <ConceptListItem concept={concept} key={`concept-list-item-${index}`} />
+              <ConceptListItem concept={concept} search={search} key={`concept-list-item-${index}`} />
             ))
           )}
         </div>

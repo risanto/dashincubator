@@ -174,3 +174,18 @@ export function addHTTPS(url) {
   }
   return url;
 }
+
+export const getHighlightedText = (text, highlight) => {
+  const parts = text.split(new RegExp(`(${highlight})`, "gi"));
+  return (
+    <span>
+      {parts.map((part) =>
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <span style={{ backgroundColor: "#eaf194" }}>{part}</span>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
+};

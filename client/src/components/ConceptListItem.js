@@ -4,45 +4,85 @@ import { ConceptLocation } from "../Locations";
 import FadeIn from "react-fade-in";
 import { useHistory } from "react-router";
 import UserAvatar from "./UserAvatar";
-import checkboxIcon from "./images/dashLogo.svg";
+import projectIcon from "../views/ApproveConcept/images/project.svg";
 import commentEmpty from "./images/commentEmpty.svg";
 import commentNew from "./images/commentNew.svg";
+import {getHighlightedText, truncate} from "../utils/utils";
+import ReactDOMServer from "react-dom/server";
+import moment from "moment";
 
 const useStyles = createUseStyles({
   conceptCardWrapper: {
     cursor: "pointer",
     userSelect: "none",
-    backgroundColor: "white",
-    padding: "10px",
-    marginBottom: 10,
+    backgroundColor: "#eee",
+    padding: 16,
+    borderRadius: 6,
+    marginBottom: 16,
     display: "flex",
-    alignItems: "center",
+    flexDirection: "column",
   },
-  conceptCardIcon: {
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  conceptCardIconWrapper: {
     display: "flex",
     alignItems: "center",
     marginRight: 10,
+    fontSize: 11,
+  },
+  conceptCardIcon: {
+    backgroundColor: "#FCAFC6",
+    padding: 2,
+    borderRadius: 4,
+    width: 20,
+    height: 20,
+    display: "inline-block",
+    marginRight: 5,
   },
   conceptTitle: {
-    width: 150,
     fontWeight: 600,
     fontSize: 14,
     lineHeight: "17px",
-    marginRight: 10,
+    marginBottom: 8,
   },
   conceptDescription: {
     flex: 1,
+    fontSize: 12,
+    lineHeight: "18px",
+    marginBottom: 8,
   },
   conceptComments: {
-    marginLeft: 10,
+    marginTop: 10,
     display: "flex",
-    alignItems: "center"
+    justifyContent: "flex-end"
+  },
+  conceptUserInfo: {
+    display: "flex",
+    alignItems: "center",
+    fontSize: 11,
+    lineHeight: "12px",
+  },
+  conceptCreatedAt: {
+    marginRight: 8,
   }
 });
 
-export default function ConceptListItem({ concept }) {
+export default function ConceptListItem({ concept, search }) {
   const classes = useStyles();
   const history = useHistory();
+
+  const highlightedValueProposition = ReactDOMServer.renderToStaticMarkup(
+    getHighlightedText(
+      search &&
+      concept.valueProposition.toUpperCase().includes(search.toUpperCase())
+        ? concept.valueProposition.replace(/<[^>]*>?/gm, "")
+        : truncate(concept.valueProposition, 170).replace(/<[^>]*>?/gm, ""),
+      search
+    )
+  );
 
   return (
     <FadeIn>
@@ -50,21 +90,26 @@ export default function ConceptListItem({ concept }) {
         onClick={() => history.push(ConceptLocation(concept.displayURL))}
         className={classes.conceptCardWrapper}
       >
-        <div className={classes.conceptCardIcon}>
-          <img src={checkboxIcon} alt={"check"} style={{ width: 16, marginRight: 5, }} /> Concept
+        <div className={classes.header}>
+          <div className={classes.conceptCardIconWrapper}>
+            <img className={classes.conceptCardIcon} src={projectIcon} alt={"check"} /> Concept
+          </div>
+          <div className={classes.conceptUserInfo}>
+            <div className={classes.conceptCreatedAt}>Created {moment(concept.dateCreated).fromNow()}</div>
+            <UserAvatar
+              user={concept.user}
+              size={18}
+              fontSize={"8px"}
+              lineHeight={"10px"}
+            />
+          </div>
         </div>
         <div className={classes.conceptTitle}>
-          {concept.title}
+          {getHighlightedText(concept.title, search)}
         </div>
-        <div className={classes.conceptDescription} dangerouslySetInnerHTML={{ __html: concept.valueProposition}} />
-        <UserAvatar
-          user={concept.user}
-          size={18}
-          fontSize={"8px"}
-          lineHeight={"10px"}
-        />
+        <div className={classes.conceptDescription} dangerouslySetInnerHTML={{ __html: highlightedValueProposition }} />
         <div className={classes.conceptComments}>
-          {concept.comments.length > 0 ? <img src={commentNew} style={{width: 16}} alt="comments-new" /> : <img src={commentEmpty} style={{width: 16}} alt="comments-empty" /> }
+          <img src={concept.comments.length > 0 ? commentNew : commentEmpty } style={{width: 16}} alt="comments-new" />
         </div>
       </div>
     </FadeIn>

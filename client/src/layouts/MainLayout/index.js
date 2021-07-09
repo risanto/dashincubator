@@ -176,6 +176,14 @@ export default function MainLayout({ children, style, match }) {
           <div
             className={styles.navItem}
             style={{ marginTop: "24px" }}
+            onClick={handleConcept}
+          >
+            <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
+            <div className={styles.navTitle}>Concepts</div>
+          </div>
+          <div
+            className={styles.navItem}
+            style={{ marginTop: "24px" }}
             onClick={() => {
               setShowNav(false);
               history.push(ActivityLocation);
@@ -194,14 +202,6 @@ export default function MainLayout({ children, style, match }) {
           >
             <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
             <div className={styles.navTitle}>Rewards</div>
-          </div>
-          <div
-            className={styles.navItem}
-            style={{ marginTop: "24px" }}
-            onClick={handleConcept}
-          >
-            <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
-            <div className={styles.navTitle}>Concepts</div>
           </div>
           <div
             className={styles.navItem}
@@ -292,6 +292,20 @@ export default function MainLayout({ children, style, match }) {
               style={{
                 marginLeft: "32px",
                 borderBottom:
+                  match?.path === ConceptsLocation
+                    ? "4px solid #fff"
+                    : "4px solid transparent",
+              }}
+              onClick={handleConcept}
+            >
+              <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
+              <div className={styles.navTitle}>Concepts</div>
+            </div>
+            <div
+              className={styles.navItem}
+              style={{
+                marginLeft: "32px",
+                borderBottom:
                   match?.path === ActivityLocation
                     ? "4px solid #fff"
                     : "4px solid transparent",
@@ -314,20 +328,6 @@ export default function MainLayout({ children, style, match }) {
             >
               <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
               <div className={styles.navTitle}>Rewards</div>
-            </div>
-            <div
-              className={styles.navItem}
-              style={{
-                marginLeft: "32px",
-                borderBottom:
-                  match?.path === ConceptsLocation
-                    ? "4px solid #fff"
-                    : "4px solid transparent",
-              }}
-              onClick={handleConcept}
-            >
-              <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
-              <div className={styles.navTitle}>Concepts</div>
             </div>
             <Tooltip title="Logout">
               <img
