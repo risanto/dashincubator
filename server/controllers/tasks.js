@@ -40,8 +40,9 @@ router.get(
       .find({
         status: "open",
       })
+      .sort({ dateCreated: -1 })
       .toArray();
-    res.send(result.sort((a, b) => new Date(b.date) - new Date(a.date)));
+    res.send(result);
   })
 );
 
