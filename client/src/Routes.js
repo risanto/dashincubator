@@ -1,6 +1,7 @@
 import React from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import {
+  ConceptsLocation,
   ConceptLocationTemplate,
   RequestNewConceptLocation,
   RootLocation,
@@ -24,6 +25,7 @@ import LoginView from "./views/Login";
 import { LoginLocation } from "./Locations";
 import RequestNewConceptView from "./views/RequestNewConcept";
 import ConceptView from "./views/Concept";
+import ConceptsView from "./views/Concepts";
 import BountyView from "./views/Bounty";
 import PaymentsView from "./views/Payments";
 import ProfileView from "./views/Profile";
@@ -70,6 +72,12 @@ const routes = [
     component: HomeView,
   },
   { path: LoginLocation, exact: true, component: LoginView },
+  {
+    path: ConceptsLocation,
+    exact: true,
+    withAuth: true,
+    component: ConceptsView,
+  },
   {
     path: RequestNewConceptLocation,
     exact: true,
