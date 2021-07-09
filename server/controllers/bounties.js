@@ -112,15 +112,21 @@ router.put(
   "/comment/:id/last-seen",
   ...authHandlers(async (req, res) => {
     // Read out comments
-    await activityCollection.updateMany(
-      {
-        $or: [
-          { bountyID: ObjectID(req.params.id), activityLevel: "task" },
-          { bountyID: ObjectID(req.params.id), activityLevel: "bounty" },
-        ]
-      },
-      { $set: { lastViewedAt: new Date() } }
-    );
+    try {
+      await activityCollection.updateMany(
+        {
+          $or: [
+            {bountyID: ObjectID(req.params.id), activityLevel: "task"},
+            {bountyID: ObjectID(req.params.id), activityLevel: "bounty"},
+          ]
+        },
+        {$set: {lastViewedAt: new Date()}}
+      );
+
+      res.send({message: "success"});
+    } catch (e) {
+      res.status(500).send({message: e.message});
+    }
   })
 );
 
