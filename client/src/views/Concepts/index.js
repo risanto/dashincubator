@@ -149,6 +149,15 @@ export default function ConceptsView({ match }) {
   useEffect(() => {
     getAdminsSimple()
       .then((res) => res.json())
+      .then((data) => data.sort((a, b) => {
+        if (a.username.toLowerCase() < b.username.toLowerCase()) {
+          return -1;
+        }
+        if (a.username.toLowerCase() === b.username.toLowerCase()) {
+          return 0;
+        }
+        return 1;
+      }))
       .then((data) => setAdmins(data));
   }, []);
 
