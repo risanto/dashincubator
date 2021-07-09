@@ -126,7 +126,7 @@ export default function ConceptsView({ match }) {
   const [concepts, setConcepts] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const [searchStatus, setSearchStatus] = useState(conceptStatus);
+  const [searchStatus, setSearchStatus] = useState([conceptStatus[0]]);
   const [searchingStatus, setSearchingStatus] = useState(false);
   const [searchCreators, setSearchCreators] = useState([]);
   const [searchingCreators, setSearchingCreators] = useState(false);
