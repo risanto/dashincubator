@@ -44,7 +44,7 @@ const useStyles = createUseStyles({
   },
   conceptTitle: {
     fontWeight: 600,
-    fontSize: 14,
+    fontSize: 18,
     lineHeight: "17px",
     marginBottom: 8,
   },
