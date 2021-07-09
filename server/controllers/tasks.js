@@ -34,6 +34,18 @@ router.get(
 );
 
 router.get(
+  "/open",
+  ...authHandlers(async (req, res) => {
+    const result = await tasksCollection
+      .find({
+        status: "open",
+      })
+      .toArray();
+    res.send(result.sort((a, b) => new Date(b.date) - new Date(a.date)));
+  })
+);
+
+router.get(
   "/completed",
   ...authHandlers(async (req, res) => {
     let jobItems = [];
