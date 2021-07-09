@@ -1,5 +1,10 @@
 import { dashincubatorRequest, RequestTypes } from "./serverRequest";
 
+export const fetchOpenTasks = async () => {
+  const response = await dashincubatorRequest(`tasks/open`, RequestTypes.Get);
+  return response.json();
+};
+
 export const getTask = async (id) =>
   dashincubatorRequest(`tasks/get/${id}`, RequestTypes.Get);
 
