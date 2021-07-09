@@ -104,6 +104,16 @@ router.get(
         ],
       })
       .toArray();
+    // Read out comments
+    await activityCollection.updateMany(
+      {
+        $or: [
+          { bountyID: ObjectID(req.params.id), activityLevel: "task" },
+          { bountyID: ObjectID(req.params.id), activityLevel: "bounty" },
+        ]
+      },
+      { $set: { lastViewedAt: new Date() } }
+    );
     res.send(result.sort((a, b) => new Date(b.date) - new Date(a.date)));
   })
 );
@@ -148,7 +158,9 @@ router.get(
             (a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)
           ).map((bounty) => ({
             ...bounty,
-            comments: bounty.comments.filter(comment => ["task", "bounty"].includes(comment.activityLevel) && comment.activityType === "commentBounty")
+            comments: bounty.comments
+              .filter(comment => ["task", "bounty"].includes(comment.activityLevel) && comment.activityType === "commentBounty")
+              .sort((a, b) => new Date(b.date) - new Date(a.date))
           }))
         );
       });
