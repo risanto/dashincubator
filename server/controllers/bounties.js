@@ -109,20 +109,6 @@ router.get(
 );
 
 router.get(
-  "/get/:id/see-activity",
-  ...authHandlers(async (req, res) => {
-    // add username with time of view
-    const newKey = `lastView.${req.tokenPayload.username}`;
-
-    await activityCollection.updateMany(
-      { bountyID: ObjectID(req.params.id) },
-      { $set: { [newKey]: new Date() } }
-    );
-    res.send({ message: "success" });
-  })
-);
-
-router.get(
   "/concepts/public",
   ...authHandlers(async (req, res) => {
     bountiesCollection
