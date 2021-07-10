@@ -93,25 +93,22 @@ export default function TaskListCard({ task }) {
   });
 
   useState(() => {
-    async function fetchData() {
-      try {
-        getTaskActivity(task._id)
-          .then((data) => data.json())
-          .then((results) => {
-            if (results.length) {
-              let unseen = 0;
+    function fetchData() {
+      getTaskActivity(task._id)
+        .then((data) => data.json())
+        .then((results) => {
+          if (results.length) {
+            let unseen = 0;
 
-              for (let i = 0; i < results.length; i++) {
-                if (!results[i].lastView?.[loggedInUser.username]) {
-                  unseen++;
-                }
+            for (let i = 0; i < results.length; i++) {
+              // if the current logged in user doesn't exist in activity's last view, add to the unseen comments
+              if (!results[i].lastView?.[loggedInUser.username]) {
+                unseen++;
               }
-              setUnseenComments(unseen);
             }
-          });
-      } catch (error) {
-        console.log("error in TaskListCard ===>", error);
-      }
+            setUnseenComments(unseen);
+          }
+        });
     }
     fetchData();
   }, []);
