@@ -2,7 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import addIcon from "./images/add.svg";
 import FadeIn from "react-fade-in";
-import { fetchBounties, fetchConcepts } from "../../api/bountiesApi";
+
+import { fetchOpenTasks } from "../../api/tasksApi";
+import { fetchConcepts } from "../../api/bountiesApi";
+
 import ConceptCard from "../../components/ConceptCard";
 import { createUseStyles } from "react-jss";
 import useOutsideAlerter, {
@@ -13,7 +16,9 @@ import useOutsideAlerter, {
 import RequestNewConceptView from "../RequestNewConcept";
 import searchIcon from "./images/search.svg";
 import caretDownIcon from "./images/caretDown.svg";
-import BountyCard from "../../components/BountyCard";
+
+import TaskCard from "../../components/TaskCard";
+
 import check from "./images/check.svg";
 import checked from "./images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
@@ -124,13 +129,13 @@ const useStyles = createUseStyles({
 
 export default function HomeView({ match }) {
   const [concepts, setConcepts] = useState([]);
+  const [openTasks, setOpenTasks] = useState([]);
+
   const [search, setSearch] = useState("");
   const [searchStatus, setSearchStatus] = useState(["active"]);
   const [searchingStatus, setSearchingStatus] = useState(false);
   const [searchTypes, setSearchTypes] = useState([]);
   const [searchingTypes, setSearchingTypes] = useState(false);
-
-  const [bounties, setBounties] = useState([]); // gonna be changed to tasks
   const [requestModal, setRequestModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState(0);
@@ -139,47 +144,46 @@ export default function HomeView({ match }) {
   const typeRef = useRef();
 
   useEffect(() => {
-    setLoading(true);
-    fetchConcepts().then((results) => {
-      setLoading(false);
-      setConcepts(results);
-    });
-  }, []);
+    async function fetchHomeData() {
+      setLoading(true);
 
-  useEffect(() => { //change to fetchTasks and combine in one useEffect
-    setLoading(true);
-    fetchBounties().then((results) => {
-      setLoading(false);
-      setBounties(results);
-    });
-  }, []);
+      const conceptsData = await fetchConcepts();
+      setConcepts(conceptsData);
 
-  //eslint-disable-next-line
-  const filteredBounties = bounties.filter((bounty) => {
-    if (
-      bounty.title.toUpperCase().includes(search.toUpperCase()) ||
-      bounty.valueProposition.toUpperCase().includes(search.toUpperCase())
-    ) {
-      if (searchTypes.length > 0) {
-        if (searchTypes.includes(bounty.bountyType)) {
-          if (searchStatus.length > 0) {
-            if (searchStatus.some((r) => bounty.status === r)) {
-              return bounty;
-            }
-          } else {
-            return bounty;
-          }
-        }
-      } else {
-        if (searchStatus.length > 0) {
-          if (searchStatus.some((r) => bounty.status === r)) {
-            return bounty;
-          }
-        } else {
-          return bounty;
-        }
-      }
+      const openTaskData = await fetchOpenTasks();
+      setOpenTasks(openTaskData);
+
+      setLoading(false);
     }
+    fetchHomeData();
+  }, []);
+
+  const filteredOpenTasks = openTasks.filter((task) => {
+    // if (
+    //   task.title.toUpperCase().includes(search.toUpperCase()) ||
+    //   task.valueProposition.toUpperCase().includes(search.toUpperCase())
+    // ) {
+    //   if (searchTypes.length > 0) {
+    //     if (searchTypes.includes(bounty.bountyType)) {
+    //       if (searchStatus.length > 0) {
+    //         if (searchStatus.some((r) => bounty.status === r)) {
+    //           return bounty;
+    //         }
+    //       } else {
+    //         return bounty;
+    //       }
+    //     }
+    //   } else {
+    //     if (searchStatus.length > 0) {
+    //       if (searchStatus.some((r) => bounty.status === r)) {
+    //         return bounty;
+    //       }
+    //     } else {
+    //       return bounty;
+    //     }
+    //   }
+    // }
+    return [];
   });
 
   const modifyStatus = (status) => {
@@ -241,7 +245,7 @@ export default function HomeView({ match }) {
                 onClick={() => setTab(1)}
               >
                 OPEN TASKS
-              </div> 
+              </div>
             </div>
           )}
           <div style={{ display: "flex" }}>
@@ -477,11 +481,13 @@ export default function HomeView({ match }) {
                     </div>
                   </div>
                 </div>
-                {/* <div
+                <div
+                  id={"open-tasks"}
                   style={{
                     marginTop: "16px",
                   }}
                 >
+                  {/* {openTasks.length && JSON.stringify(openTasks)} */}
                   {loading ? (
                     <div
                       style={{
@@ -492,7 +498,7 @@ export default function HomeView({ match }) {
                     >
                       <CircularProgress style={{ color: "white" }} />
                     </div>
-                  ) : search && filteredBounties.length === 0 ? (
+                  ) : search && filteredOpenTasks.length === 0 ? (
                     <div
                       style={{
                         color: "white",
@@ -501,14 +507,17 @@ export default function HomeView({ match }) {
                         marginTop: "32px",
                       }}
                     >
-                      No bounties found
+                      No tasks found
                     </div>
                   ) : (
-                    filteredBounties.map((bounty) => (
-                      <BountyCard bounty={bounty} search={search} />
-                    ))
+                    filteredOpenTasks.map((task, idx) => {
+                      // if (idx < 10) {
+                        return <TaskCard task={task} />;
+                      // }
+                      // return null;
+                    })
                   )}
-                </div> */}
+                </div>
               </div>
             )}
           </div>
