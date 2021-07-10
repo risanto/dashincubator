@@ -17,6 +17,9 @@ export const createTask = async (task, bountyID) =>
 export const updateTask = (data) =>
   dashincubatorRequest(`tasks/update`, RequestTypes.Put, data);
 
+export const updateTaskActivityView = (id) =>
+  dashincubatorRequest(`tasks/activity-viewed/${id}`, RequestTypes.Put);
+
 export const requestToReserveTask = (user, taskId) => {
   dashincubatorRequest(
     `tasks/request-to-reserve/${taskId}`,

@@ -156,7 +156,7 @@ const useStyles = createUseStyles({
       position: "relative",
       borderRadius: "4px",
     },
-    valueProposition: { flexShrink: 0, maxWidth: "516px" },
+    valueProposition: { flexShrink: 0, maxWidth: "400px" },
 
     container: {
       maxWidth: "1050px",
@@ -181,13 +181,10 @@ export default function BountyView({ match }) {
   const history = useHistory();
   const { loggedInUser } = useGlobalState();
 
-  console.log(match);
-
   useEffect(() => {
     getBounty(match.params.id)
       .then((result) => result.json())
       .then((data) => {
-        console.log(data);
         if (data.error) {
           history.push(RootLocation);
         } else {
@@ -209,8 +206,6 @@ export default function BountyView({ match }) {
     newBounty.tasks[taskIndex] = task;
     setBounty(newBounty);
   };
-
-  //console.log(bounty);
 
   const onComment = () => {
     if (comment.length > 0 && comment.length < 5000) {
