@@ -84,6 +84,8 @@ export const bountyTypes = ["project", "job", "service", "programme"];
 
 export const taskTypes = ["spec", "production", "qa"];
 
+export const conceptStatus = ["open", "accepted"];
+
 export const formatLink = (link) => {
   return link
     .replace("https://", "")
@@ -172,3 +174,18 @@ export function addHTTPS(url) {
   }
   return url;
 }
+
+export const getHighlightedText = (text, highlight) => {
+  const parts = text.split(new RegExp(`(${highlight})`, "gi"));
+  return (
+    <span>
+      {parts.map((part) =>
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <span style={{ backgroundColor: "#eaf194" }}>{part}</span>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
+};

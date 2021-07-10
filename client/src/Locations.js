@@ -3,6 +3,8 @@ export const RootLocation = "/";
 export const LoginLocation = "/login";
 export const RegisterLocation = "/register";
 
+export const ConceptsLocation = "/concepts";
+
 export const RequestNewConceptLocation = "/request-new-concept";
 
 export const ConceptLocationTemplate = "/concept/:id";
