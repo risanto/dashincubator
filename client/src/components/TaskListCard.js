@@ -142,7 +142,7 @@ export default function TaskCard({ task }) {
             className={styles.bountyLink}
             onClick={() => history.push(BountyLocation(task.bountyDisplayURL))}
           >
-            {`Bounty: ${task.bountyTitle}`}
+            {task.bountyTitle}
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>

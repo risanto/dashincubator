@@ -181,10 +181,13 @@ export default function BountyView({ match }) {
   const history = useHistory();
   const { loggedInUser } = useGlobalState();
 
+  console.log(match);
+
   useEffect(() => {
     getBounty(match.params.id)
       .then((result) => result.json())
       .then((data) => {
+        console.log(data);
         if (data.error) {
           history.push(RootLocation);
         } else {

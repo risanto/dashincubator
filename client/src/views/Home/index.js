@@ -1,24 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import MainLayout from "../../layouts/MainLayout";
-import addIcon from "./images/add.svg";
 import FadeIn from "react-fade-in";
 
 import { fetchOpenTasks } from "../../api/tasksApi";
-import { fetchConcepts } from "../../api/bountiesApi";
-
-import ConceptCard from "../../components/ConceptCard";
 import { createUseStyles } from "react-jss";
-import useOutsideAlerter, {
-  bountyStatus,
-  bountyTypes,
-  Breakpoints,
-} from "../../utils/utils";
-import RequestNewConceptView from "../RequestNewConcept";
-import searchIcon from "./images/search.svg";
+import useOutsideAlerter, { taskTypes, Breakpoints } from "../../utils/utils";
+import TaskListCard from "../../components/TaskListCard";
+
 import caretDownIcon from "./images/caretDown.svg";
-
-import TaskCard from "../../components/TaskCard";
-
 import check from "./images/check.svg";
 import checked from "./images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
@@ -128,75 +117,32 @@ const useStyles = createUseStyles({
 });
 
 export default function HomeView({ match }) {
-  const [concepts, setConcepts] = useState([]);
   const [openTasks, setOpenTasks] = useState([]);
-
-  const [search, setSearch] = useState("");
-  const [searchStatus, setSearchStatus] = useState(["active"]);
-  const [searchingStatus, setSearchingStatus] = useState(false);
-  const [searchTypes, setSearchTypes] = useState([]);
+  const [searchTypes, setSearchTypes] = useState(["spec", "production", "qa"]);
   const [searchingTypes, setSearchingTypes] = useState(false);
-  const [requestModal, setRequestModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState(0);
+
   const styles = useStyles();
-  const catRef = useRef();
   const typeRef = useRef();
 
   useEffect(() => {
-    async function fetchHomeData() {
+    async function fetchData() {
       setLoading(true);
 
-      const conceptsData = await fetchConcepts();
-      setConcepts(conceptsData);
-
-      const openTaskData = await fetchOpenTasks();
-      setOpenTasks(openTaskData);
+      const taskData = await fetchOpenTasks();
+      setOpenTasks(taskData);
 
       setLoading(false);
     }
-    fetchHomeData();
+    fetchData();
   }, []);
 
   const filteredOpenTasks = openTasks.filter((task) => {
-    // if (
-    //   task.title.toUpperCase().includes(search.toUpperCase()) ||
-    //   task.valueProposition.toUpperCase().includes(search.toUpperCase())
-    // ) {
-    //   if (searchTypes.length > 0) {
-    //     if (searchTypes.includes(bounty.bountyType)) {
-    //       if (searchStatus.length > 0) {
-    //         if (searchStatus.some((r) => bounty.status === r)) {
-    //           return bounty;
-    //         }
-    //       } else {
-    //         return bounty;
-    //       }
-    //     }
-    //   } else {
-    //     if (searchStatus.length > 0) {
-    //       if (searchStatus.some((r) => bounty.status === r)) {
-    //         return bounty;
-    //       }
-    //     } else {
-    //       return bounty;
-    //     }
-    //   }
-    // }
-    return [];
-  });
-
-  const modifyStatus = (status) => {
-    const newStatus = searchStatus.slice();
-    const catIndex = newStatus.indexOf(status);
-    if (catIndex >= 0) {
-      newStatus.splice(catIndex, 1);
-      setSearchStatus(newStatus);
-    } else {
-      newStatus.push(status);
-      setSearchStatus(newStatus);
+    if (searchTypes.length > 0 && searchTypes.includes(task.taskType)) {
+      return task;
     }
-  };
+    return null;
+  });
 
   const modifyType = (category) => {
     const newCategories = searchTypes.slice();
@@ -210,274 +156,111 @@ export default function HomeView({ match }) {
     }
   };
 
-  useOutsideAlerter(catRef, () => setSearchingStatus(false));
   useOutsideAlerter(typeRef, () => setSearchingTypes(false));
 
   return (
     <MainLayout match={match}>
       <FadeIn>
-        <RequestNewConceptView
-          open={requestModal}
-          onClose={() => setRequestModal(false)}
-        />
         <div className={styles.container}>
           {isMobile && (
             <div style={{ display: "flex", marginBottom: "18px" }}>
               <div
                 className={styles.columnHeader}
                 style={{
-                  cursor: "pointer",
-                  height: "24px",
-                  borderBottom: tab === 0 ? "4px solid white" : "none",
-                }}
-                onClick={() => setTab(0)}
-              >
-                CONCEPTS IN REVIEW
-              </div>
-              <div
-                className={styles.columnHeader}
-                style={{
                   marginLeft: "46px",
                   cursor: "pointer",
                   height: "24px",
-                  borderBottom: tab === 1 ? "4px solid white" : "none",
+                  borderBottom: "4px solid white",
                 }}
-                onClick={() => setTab(1)}
               >
                 OPEN TASKS
               </div>
             </div>
           )}
           <div style={{ display: "flex" }}>
-            {((isMobile && tab === 0) || !isMobile) && (
-              <div className={styles.conceptsColumn}>
-                <div
-                  className={styles.columnHeader}
-                  style={{ display: isMobile ? "none" : "block" }}
-                >
-                  CONCEPTS IN REVIEW
-                </div>
-                <div
-                  className={styles.requestCTA}
-                  onClick={() => setRequestModal(true)}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <img
-                      src={addIcon}
-                      alt="add"
-                      style={{ width: "16px", marginRight: "4px" }}
-                    />
-                    <div>Request New Concept</div>
-                  </div>
-                </div>
-
-                {loading ? (
-                  <div className={styles.conceptsLoader}>
-                    <CircularProgress style={{ color: "white" }} />
-                  </div>
-                ) : (
-                  concepts.length > 0 && (
-                    <div style={{ marginTop: "8px" }}>
-                      {concepts.map((concept, i) => (
-                        <>
-                          {i !== 0 && (
-                            <hr
-                              style={{
-                                opacity: 0.15,
-                                border: "0.5px solid #fff",
-                              }}
-                            />
-                          )}
-                          <ConceptCard concept={concept} />
-                        </>
-                      ))}
-                    </div>
-                  )
-                )}
-              </div>
-            )}
-            {((isMobile && tab === 1) || !isMobile) && (
+            {!isMobile && (
               <div
                 style={{
                   width: "100%",
                 }}
               >
                 <div
-                  className={styles.columnHeader}
-                  style={{ display: isMobile ? "none" : "block" }}
+                  style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                  OPEN TASKS
-                </div>
-                <div className={styles.searchContainer}>
-                  <div className={styles.searchIconContainer}>
-                    <img
-                      src={searchIcon}
-                      alt="search"
-                      className={styles.searchIcon}
-                    />
-                    <input
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder={"Find a task"}
-                      className={styles.searchInput}
-                    />
+                  <div
+                    className={styles.columnHeader}
+                    style={{ display: isMobile ? "none" : "block" }}
+                  >
+                    OPEN TASKS
                   </div>
                   <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "8px",
-                    }}
+                    className={styles.filterContainer}
+                    onClick={() => setSearchingTypes(true)}
                   >
-                    <div
-                      className={styles.filterContainer}
-                      onClick={() => setSearchingTypes(true)}
-                    >
-                      {searchingTypes && (
-                        <div
-                          style={{
-                            width: "106px",
-                          }}
-                          className={styles.filterItemsContainer}
-                          ref={typeRef}
-                        >
-                          {bountyTypes.map((tag, i) => (
-                            <div
-                              style={{
-                                marginTop: i > 0 && "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                cursor: "pointer",
-                                userSelect: "none",
-                              }}
-                              onClick={() => modifyType(tag)}
-                            >
-                              <img
-                                src={
-                                  searchTypes.find((cat) => cat === tag)
-                                    ? checked
-                                    : check
-                                }
-                                alt="check"
-                                style={{
-                                  marginRight: "6px",
-                                  width: "16px",
-                                  height: "16px",
-                                }}
-                              />
-                              {tag === "project"
-                                ? "Projects"
-                                : tag === "job"
-                                ? "Jobs"
-                                : tag === "service"
-                                ? "Services"
-                                : tag === "programme"
-                                ? "Programmes"
-                                : null}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <img
-                        src={caretDownIcon}
-                        alt="dropdown"
-                        className={styles.filterCaret}
-                        style={{
-                          width: "9px",
-                          marginRight: "8px",
-                          transform: searchingTypes
-                            ? "rotate(-180deg)"
-                            : "rotate(0deg)",
-                        }}
-                      />
+                    {searchingTypes && (
                       <div
                         style={{
-                          fontWeight: 600,
-                          color: "white",
-                          fontSize: "12px",
-                          lineHeight: "15px",
+                          width: "106px",
                         }}
+                        className={styles.filterItemsContainer}
+                        ref={typeRef}
                       >
-                        Type
-                      </div>
-                    </div>
-                    <div style={{ position: "relative", marginLeft: "20px" }}>
-                      {searchingStatus && (
-                        <div
-                          style={{
-                            width: "100px",
-                          }}
-                          className={styles.filterItemsContainer}
-                          ref={catRef}
-                        >
-                          {bountyStatus.map((tag, i) => (
-                            <div
+                        {taskTypes.map((tag, i) => (
+                          <div
+                            style={{
+                              marginTop: i > 0 && "8px",
+                              display: "flex",
+                              alignItems: "center",
+                              cursor: "pointer",
+                              userSelect: "none",
+                            }}
+                            onClick={() => modifyType(tag)}
+                          >
+                            <img
+                              src={
+                                searchTypes.find((cat) => cat === tag)
+                                  ? checked
+                                  : check
+                              }
+                              alt="check"
                               style={{
-                                marginTop: i > 0 && "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                cursor: "pointer",
-                                userSelect: "none",
+                                marginRight: "6px",
+                                width: "16px",
+                                height: "16px",
                               }}
-                              onClick={() => modifyStatus(tag)}
-                            >
-                              <img
-                                src={
-                                  searchStatus.find((cat) => cat === tag)
-                                    ? checked
-                                    : check
-                                }
-                                alt="check"
-                                style={{
-                                  marginRight: "6px",
-                                  width: "16px",
-                                  height: "16px",
-                                }}
-                              />
-                              {tag === "active"
-                                ? "Active"
-                                : tag === "paused"
-                                ? "Paused"
-                                : "Completed"}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {/* <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          cursor: "pointer",
-                          userSelect: "none",
-                        }}
-                        onClick={() => setSearchingStatus(true)}
-                      >
-                        <img
-                          src={caretDownIcon}
-                          alt="dropdown"
-                          style={{
-                            transform: searchingStatus
-                              ? "rotate(-180deg)"
-                              : "rotate(0deg)",
-                          }}
-                          className={styles.filterCaret}
-                        />
-                        <div
-                          style={{
-                            fontWeight: 600,
-                            color: "white",
-                            fontSize: "12px",
-                            lineHeight: "15px",
-                          }}
-                        >
-                          {isMobile ? "Status" : "Filter status"}
-                        </div>
-                      </div> */}
+                            />
+                            {tag === "spec"
+                              ? "Spec"
+                              : tag === "production"
+                              ? "Production"
+                              : tag === "qa"
+                              ? "QA"
+                              : null}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <img
+                      src={caretDownIcon}
+                      alt="dropdown"
+                      className={styles.filterCaret}
+                      style={{
+                        width: "9px",
+                        marginRight: "8px",
+                        transform: searchingTypes
+                          ? "rotate(-180deg)"
+                          : "rotate(0deg)",
+                      }}
+                    />
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        color: "white",
+                        fontSize: "12px",
+                        lineHeight: "15px",
+                      }}
+                    >
+                      Type
                     </div>
                   </div>
                 </div>
@@ -487,7 +270,6 @@ export default function HomeView({ match }) {
                     marginTop: "16px",
                   }}
                 >
-                  {/* {openTasks.length && JSON.stringify(openTasks)} */}
                   {loading ? (
                     <div
                       style={{
@@ -498,7 +280,7 @@ export default function HomeView({ match }) {
                     >
                       <CircularProgress style={{ color: "white" }} />
                     </div>
-                  ) : search && filteredOpenTasks.length === 0 ? (
+                  ) : filteredOpenTasks.length === 0 ? (
                     <div
                       style={{
                         color: "white",
@@ -511,10 +293,7 @@ export default function HomeView({ match }) {
                     </div>
                   ) : (
                     filteredOpenTasks.map((task, idx) => {
-                      // if (idx < 10) {
-                        return <TaskCard task={task} />;
-                      // }
-                      // return null;
+                      return <TaskListCard key={idx} task={task} />;
                     })
                   )}
                 </div>
