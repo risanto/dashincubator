@@ -33,20 +33,6 @@ router.get(
   })
 );
 
-router.put(
-  "/get/:id/see-activity",
-  ...authHandlers(async (req, res) => {
-    // add username with time of view
-    const newKey = `lastView.${req.tokenPayload.username}`;
-
-    await activityCollection.updateMany(
-      { taskID: ObjectID(req.params.id), activityLevel: "task" },
-      { $set: { [newKey]: new Date() } }
-    );
-    res.send({ message: "success" });
-  })
-);
-
 router.get(
   "/open",
   ...authHandlers(async (req, res) => {
@@ -812,5 +798,20 @@ router.put(
     res.send({ message: "success" });
   })
 );
+
+router.put(
+  "/activity-viewed/:id",
+  ...authHandlers(async (req, res) => {
+    // add username with time of view
+    const newKey = `lastView.${req.tokenPayload.username}`;
+
+    await activityCollection.updateMany(
+      { taskID: ObjectID(req.params.id), activityLevel: "task" },
+      { $set: { [newKey]: new Date() } }
+    );
+    res.send({ message: "success" });
+  })
+);
+
 
 module.exports = router;

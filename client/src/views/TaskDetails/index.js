@@ -3,7 +3,7 @@ import { createUseStyles } from "react-jss";
 import {
   commentTask,
   getTaskActivity,
-  seeTaskActivity,
+  updateTaskActivityView,
   requestToReserveTask,
 } from "../../api/tasksApi";
 import { CircularProgress } from "@material-ui/core";
@@ -148,7 +148,7 @@ export default function TaskDetailsView({
       .then((data) => data.json())
       .then((results) => {
         setActivity(results);
-        seeTaskActivity(task._id);
+        updateTaskActivityView(task._id);
       });
     //eslint-disable-next-line
   }, [open]);

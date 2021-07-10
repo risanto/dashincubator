@@ -11,14 +11,14 @@ export const getTask = async (id) =>
 export const getTaskActivity = async (id) =>
   dashincubatorRequest(`tasks/get/${id}/activity`, RequestTypes.Get);
 
-export const seeTaskActivity = (id) =>
-  dashincubatorRequest(`tasks/get/${id}/see-activity`, RequestTypes.Put);
-
 export const createTask = async (task, bountyID) =>
   dashincubatorRequest("tasks/new", RequestTypes.Post, { task, bountyID });
 
 export const updateTask = (data) =>
   dashincubatorRequest(`tasks/update`, RequestTypes.Put, data);
+
+export const updateTaskActivityView = (id) =>
+  dashincubatorRequest(`tasks/activity-viewed/${id}`, RequestTypes.Put);
 
 export const requestToReserveTask = (user, taskId) => {
   dashincubatorRequest(
