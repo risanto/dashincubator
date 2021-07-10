@@ -121,18 +121,26 @@ export default function HomeView({ match }) {
   const [searchTypes, setSearchTypes] = useState(["spec", "production", "qa"]);
   const [searchingTypes, setSearchingTypes] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState();
 
   const styles = useStyles();
   const typeRef = useRef();
 
   useEffect(() => {
     async function fetchData() {
-      setLoading(true);
+      try {
+        setLoading(true);
 
-      const taskData = await fetchOpenTasks();
-      setOpenTasks(taskData);
+        const taskData = await fetchOpenTasks();
+        setOpenTasks(taskData);
 
-      setLoading(false);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        setErrorMessage(
+          "There's something wrong with the server, can't fetch the data :("
+        );
+      }
     }
     fetchData();
   }, []);
@@ -279,6 +287,17 @@ export default function HomeView({ match }) {
                       }}
                     >
                       <CircularProgress style={{ color: "white" }} />
+                    </div>
+                  ) : errorMessage ? (
+                    <div
+                      style={{
+                        color: "white",
+                        fontSize: "12px",
+                        textAlign: "center",
+                        marginTop: "32px",
+                      }}
+                    >
+                      {errorMessage}
                     </div>
                   ) : filteredOpenTasks.length === 0 ? (
                     <div
