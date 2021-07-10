@@ -99,7 +99,7 @@ export default function TaskItem({ taskData, i, bounty, modifyTask }) {
       <TaskDetailsView
         task={task}
         open={showDetailsModal}
-        // bounty={bounty}
+        bounty={bounty}
         onClose={() => setShowDetailsModal(false)}
         onReview={() => {
           setShowDetailsModal(false);
@@ -176,7 +176,7 @@ export default function TaskItem({ taskData, i, bounty, modifyTask }) {
         }}
         task={task}
       />
-      {/* <EditTaskView
+      <EditTaskView
         open={showModal}
         task={task}
         onClose={(e, submit, data) => {
@@ -189,7 +189,7 @@ export default function TaskItem({ taskData, i, bounty, modifyTask }) {
           }
         }}
         concept={bounty}
-      /> */}
+      />
       <div className={styles.index}>{i + 1}</div>
       <div>
         <div
