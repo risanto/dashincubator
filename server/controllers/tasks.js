@@ -37,10 +37,29 @@ router.get(
   "/open",
   ...authHandlers(async (req, res) => {
     const result = await tasksCollection
-      .find({
-        status: "open",
-      })
-      .sort({ dateCreated: -1 })
+      .aggregate([
+        {
+          $match: {
+            status: "open",
+          },
+        },
+        {
+          $lookup: {
+            from: "activity",
+            let: { taskID: "$_id" },
+            pipeline: [
+              { $match: { $expr: { $eq: ["$taskID", "$$taskID"] } } },
+              { $sort: { date: -1 } },
+            ],
+            as: "comments",
+          },
+        },
+        {
+          $sort: {
+            dateCreated: -1,
+          },
+        },
+      ])
       .toArray();
     res.send(result);
   })
