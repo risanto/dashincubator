@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import useGlobalState from "../state";
 
 import dashLogo from "./images/dashLogo.svg";
 import commentEmpty from "./images/commentEmpty.svg";
@@ -6,6 +7,8 @@ import commentNew from "./images/commentNew.svg";
 import checklistIcon from "./images/checklistIcon.svg";
 import productIcon from "./images/productIcon.svg";
 import qualityIcon from "./images/qualityIcon.svg";
+
+import { getTaskActivity } from "../api/tasksApi";
 
 import moment from "moment";
 import { longhandRelative, Breakpoints } from "../utils/utils";
@@ -78,13 +81,40 @@ const useStyles = createUseStyles({
   },
 });
 
-export default function TaskCard({ task }) {
+export default function TaskListCard({ task }) {
+  const { loggedInUser } = useGlobalState();
   const styles = useStyles();
   const history = useHistory();
+
+  const [unseenComments, setUnseenComments] = useState(0);
 
   moment.updateLocale("en", {
     relativeTime: longhandRelative,
   });
+
+  useState(() => {
+    async function fetchData() {
+      try {
+        getTaskActivity(task._id)
+          .then((data) => data.json())
+          .then((results) => {
+            if (results.length) {
+              let unseen = 0;
+
+              for (let i = 0; i < results.length; i++) {
+                if (!results[i].lastView?.[loggedInUser.username]) {
+                  unseen++;
+                }
+              }
+              setUnseenComments(unseen);
+            }
+          });
+      } catch (error) {
+        console.log("error in TaskListCard ===>", error);
+      }
+    }
+    fetchData();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -152,10 +182,22 @@ export default function TaskCard({ task }) {
               alignItems: "center",
             }}
           >
-            <div style={{ marginRight: "12px" }}>
+            <div
+              style={{
+                marginRight: "12px",
+                cursor: "pointer",
+                display: "flex",
+              }}
+              onClick={() =>
+                history.push(BountyLocation(task.bountyDisplayURL))
+              }
+            >
+              <div style={{ marginRight: "6px", fontSize: "11px" }}>
+                {unseenComments > 0 && unseenComments}
+              </div>
               <img
                 alt={"comment"}
-                src={task.comments.length > 0 ? commentNew : commentEmpty}
+                src={unseenComments === 0 ? commentEmpty : commentNew}
                 style={{ width: 16 }}
               />
             </div>
