@@ -109,6 +109,20 @@ router.get(
 );
 
 router.get(
+  "/get/:id/see-activity",
+  ...authHandlers(async (req, res) => {
+    // add username with time of view
+    const newKey = `lastView.${req.tokenPayload.username}`;
+
+    await activityCollection.updateMany(
+      { bountyID: ObjectID(req.params.id) },
+      { $set: { [newKey]: new Date() } }
+    );
+    res.send({ message: "success" });
+  })
+);
+
+router.get(
   "/concepts/public",
   ...authHandlers(async (req, res) => {
     bountiesCollection
@@ -136,20 +150,32 @@ router.get(
             localField: "_id",
             foreignField: "bountyID",
             as: "comments",
-          }
+          },
         },
         {
-          $project : { user: 1, title: 1, displayURL: 1, dateCreated: 1, status: 1, valueProposition: 1, comments: 1 }
-        }
+          $project: {
+            user: 1,
+            title: 1,
+            displayURL: 1,
+            dateCreated: 1,
+            status: 1,
+            valueProposition: 1,
+            comments: 1,
+          },
+        },
       ])
       .toArray((err, bounties) => {
         res.send(
-          bounties.sort(
-            (a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)
-          ).map((bounty) => ({
-            ...bounty,
-            comments: bounty.comments.filter(comment => ["task", "bounty"].includes(comment.activityLevel) && comment.activityType === "commentBounty")
-          }))
+          bounties
+            .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
+            .map((bounty) => ({
+              ...bounty,
+              comments: bounty.comments.filter(
+                (comment) =>
+                  ["task", "bounty"].includes(comment.activityLevel) &&
+                  comment.activityType === "commentBounty"
+              ),
+            }))
         );
       });
   })

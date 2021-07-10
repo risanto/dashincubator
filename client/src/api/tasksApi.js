@@ -11,6 +11,9 @@ export const getTask = async (id) =>
 export const getTaskActivity = async (id) =>
   dashincubatorRequest(`tasks/get/${id}/activity`, RequestTypes.Get);
 
+export const seeTaskActivity = async (id) =>
+  dashincubatorRequest(`tasks/get/${id}/see-activity`, RequestTypes.Get);
+
 export const createTask = async (task, bountyID) =>
   dashincubatorRequest("tasks/new", RequestTypes.Post, { task, bountyID });
 
