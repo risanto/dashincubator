@@ -11,7 +11,6 @@ import caretDownIcon from "./images/caretDown.svg";
 import check from "./images/check.svg";
 import checked from "./images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
-import { isMobile } from "react-device-detect";
 
 const useStyles = createUseStyles({
   container: {
@@ -170,23 +169,8 @@ export default function HomeView({ match }) {
     <MainLayout match={match}>
       <FadeIn>
         <div className={styles.container}>
-          {isMobile && (
-            <div style={{ display: "flex", marginBottom: "18px" }}>
-              <div
-                className={styles.columnHeader}
-                style={{
-                  marginLeft: "46px",
-                  cursor: "pointer",
-                  height: "24px",
-                  borderBottom: "4px solid white",
-                }}
-              >
-                OPEN TASKS
-              </div>
-            </div>
-          )}
           <div style={{ display: "flex" }}>
-            {!isMobile && (
+            {
               <div
                 style={{
                   width: "100%",
@@ -195,12 +179,7 @@ export default function HomeView({ match }) {
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                  <div
-                    className={styles.columnHeader}
-                    style={{ display: isMobile ? "none" : "block" }}
-                  >
-                    OPEN TASKS
-                  </div>
+                  <div className={styles.columnHeader}>OPEN TASKS</div>
                   <div
                     className={styles.filterContainer}
                     onClick={() => setSearchingTypes(true)}
@@ -317,7 +296,7 @@ export default function HomeView({ match }) {
                   )}
                 </div>
               </div>
-            )}
+            }
           </div>
         </div>
       </FadeIn>
