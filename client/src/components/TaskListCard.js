@@ -24,7 +24,6 @@ const useStyles = createUseStyles({
     borderRadius: "6px",
     color: "#0B0F3B",
     marginBottom: "16px",
-    cursor: "pointer",
   },
   taskTypeText: { marginLeft: "5px", fontSize: "11px", lineHeight: "12px" },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
@@ -34,7 +33,6 @@ const useStyles = createUseStyles({
       backgroundColor: "white",
       borderRadius: "6px",
       marginBottom: "16px",
-      cursor: "pointer",
     },
   },
   upperSection: {
@@ -100,40 +98,26 @@ export default function TaskListCard({ task }) {
   });
 
   useEffect(() => {
-    function fetchData() {
-      getTaskActivity(task._id)
-        .then((data) => data.json())
-        .then((results) => {
-          if (results.length) {
-            let unseen = 0;
+    getTaskActivity(task._id)
+      .then((data) => data.json())
+      .then((results) => {
+        if (results.length) {
+          let unseen = 0;
 
-            for (let i = 0; i < results.length; i++) {
-              // if the current logged in user doesn't exist in activity's last view, add to the unseen comments
-              if (!results[i].lastView?.[loggedInUser.username]) {
-                unseen++;
-              }
+          for (let i = 0; i < results.length; i++) {
+            // if the current logged in user doesn't exist in activity's last view, add to the unseen comments
+            if (!results[i].lastView?.[loggedInUser.username]) {
+              unseen++;
             }
-            setUnseenComments(unseen);
           }
-        });
-    }
-    fetchData();
+          setUnseenComments(unseen);
+        }
+      });
     //eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    const handleClick = (e) => {
-      if (e.target && e.target.className.includes("ReactModal__Overlay")) {
-        return setShowDetailsModal(false);
-      }
-    };
-    if (showDetailsModal) {
-      window.addEventListener("click", handleClick);
-    }
-  }, [showDetailsModal]);
-
   return (
-    <div className={styles.container} onClick={() => setShowDetailsModal(true)}>
+    <div className={styles.container}>
       {showDetailsModal && (
         <TaskDetailsView
           task={task}
