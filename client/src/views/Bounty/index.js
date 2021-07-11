@@ -156,7 +156,7 @@ const useStyles = createUseStyles({
       position: "relative",
       borderRadius: "4px",
     },
-    valueProposition: { flexShrink: 0, maxWidth: "516px" },
+    valueProposition: { flexShrink: 0, maxWidth: "400px" },
 
     container: {
       maxWidth: "1050px",
