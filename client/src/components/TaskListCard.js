@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useGlobalState from "../state";
 
 import dashLogo from "./images/dashLogo.svg";
@@ -9,6 +9,7 @@ import productIcon from "./images/productIcon.svg";
 import qualityIcon from "./images/qualityIcon.svg";
 
 import { getTaskActivity } from "../api/tasksApi";
+import TaskDetailsView from "../views/TaskDetails";
 
 import moment from "moment";
 import { longhandRelative, Breakpoints } from "../utils/utils";
@@ -78,6 +79,9 @@ const useStyles = createUseStyles({
     fontWeight: 500,
     cursor: "pointer",
     marginLeft: "24px",
+    "&:hover": {
+      color: "#363a63",
+    },
   },
 });
 
@@ -87,34 +91,40 @@ export default function TaskListCard({ task }) {
   const history = useHistory();
 
   const [unseenComments, setUnseenComments] = useState(0);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   moment.updateLocale("en", {
     relativeTime: longhandRelative,
   });
 
-  useState(() => {
-    function fetchData() {
-      getTaskActivity(task._id)
-        .then((data) => data.json())
-        .then((results) => {
-          if (results.length) {
-            let unseen = 0;
+  useEffect(() => {
+    getTaskActivity(task._id)
+      .then((data) => data.json())
+      .then((results) => {
+        if (results.length) {
+          let unseen = 0;
 
-            for (let i = 0; i < results.length; i++) {
-              // if the current logged in user doesn't exist in activity's last view, add to the unseen comments
-              if (!results[i].lastView?.[loggedInUser.username]) {
-                unseen++;
-              }
+          for (let i = 0; i < results.length; i++) {
+            // if the current logged in user doesn't exist in activity's last view, add to the unseen comments
+            if (!results[i].lastView?.[loggedInUser.username]) {
+              unseen++;
             }
-            setUnseenComments(unseen);
           }
-        });
-    }
-    fetchData();
-  }, []);
+          setUnseenComments(unseen);
+        }
+      });
+    //eslint-disable-next-line
+  }, [showDetailsModal]);
 
   return (
     <div className={styles.container}>
+      {showDetailsModal && (
+        <TaskDetailsView
+          task={task}
+          open={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+        />
+      )}
       <div className={styles.upperSection}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <div
@@ -185,9 +195,7 @@ export default function TaskListCard({ task }) {
                 cursor: "pointer",
                 display: "flex",
               }}
-              onClick={() =>
-                history.push(BountyLocation(task.bountyDisplayURL))
-              }
+              onClick={() => setShowDetailsModal(true)}
             >
               <div style={{ marginRight: "6px", fontSize: "11px" }}>
                 {unseenComments > 0 && unseenComments}

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { createUseStyles } from "react-jss";
+
 import {
   commentTask,
   getTaskActivity,
   updateTaskActivityView,
   requestToReserveTask,
 } from "../../api/tasksApi";
+import { getBounty } from "../../api/bountiesApi";
+
 import { CircularProgress } from "@material-ui/core";
 import DashModal from "../../components/DashModal";
 import UserAvatar from "../../components/UserAvatar";
@@ -130,6 +133,7 @@ export default function TaskDetailsView({
       ) !== undefined
   );
   const [activity, setActivity] = useState(null);
+  const [bountyData, setBountyData] = useState(bounty ?? null);
   const styles = useStyles();
   const history = useHistory();
 
@@ -149,6 +153,14 @@ export default function TaskDetailsView({
       .then((results) => {
         setActivity(results);
         updateTaskActivityView(task._id);
+
+        if (!bountyData) {
+          getBounty(task.bountyDisplayURL)
+            .then((data) => data.json())
+            .then((results) => {
+              setBountyData(results);
+            });
+        }
       });
     //eslint-disable-next-line
   }, [open]);
@@ -219,7 +231,8 @@ export default function TaskDetailsView({
                     Edit task
                   </div>
                 )}
-              {bounty.bountyType === "job" &&
+              {bountyData?.bountyType === "job" &&
+              task.assignee?.username === loggedInUser?.username &&
               loggedInUser?.username !== task.createdBy.username ? (
                 <div
                   className={styles.CTA}
