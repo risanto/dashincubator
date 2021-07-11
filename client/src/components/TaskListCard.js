@@ -9,6 +9,7 @@ import productIcon from "./images/productIcon.svg";
 import qualityIcon from "./images/qualityIcon.svg";
 
 import { getTaskActivity } from "../api/tasksApi";
+import TaskDetailsView from "../views/TaskDetails";
 
 import moment from "moment";
 import { longhandRelative, Breakpoints } from "../utils/utils";
@@ -23,6 +24,7 @@ const useStyles = createUseStyles({
     borderRadius: "6px",
     color: "#0B0F3B",
     marginBottom: "16px",
+    cursor: "pointer",
   },
   taskTypeText: { marginLeft: "5px", fontSize: "11px", lineHeight: "12px" },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
@@ -32,6 +34,7 @@ const useStyles = createUseStyles({
       backgroundColor: "white",
       borderRadius: "6px",
       marginBottom: "16px",
+      cursor: "pointer",
     },
   },
   upperSection: {
@@ -78,6 +81,9 @@ const useStyles = createUseStyles({
     fontWeight: 500,
     cursor: "pointer",
     marginLeft: "24px",
+    "&:hover": {
+      color: "#363a63",
+    },
   },
 });
 
@@ -87,6 +93,7 @@ export default function TaskListCard({ task }) {
   const history = useHistory();
 
   const [unseenComments, setUnseenComments] = useState(0);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   moment.updateLocale("en", {
     relativeTime: longhandRelative,
@@ -114,7 +121,14 @@ export default function TaskListCard({ task }) {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onClick={() => setShowDetailsModal(true)}>
+      {showDetailsModal && (
+        <TaskDetailsView
+          task={task}
+          open={true}
+          onClose={() => setShowDetailsModal(false)}
+        />
+      )}
       <div className={styles.upperSection}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <div
@@ -185,9 +199,7 @@ export default function TaskListCard({ task }) {
                 cursor: "pointer",
                 display: "flex",
               }}
-              onClick={() =>
-                history.push(BountyLocation(task.bountyDisplayURL))
-              }
+              onClick={() => setShowDetailsModal(true)}
             >
               <div style={{ marginRight: "6px", fontSize: "11px" }}>
                 {unseenComments > 0 && unseenComments}
