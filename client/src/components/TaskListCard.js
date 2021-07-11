@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useGlobalState from "../state";
 
 import dashLogo from "./images/dashLogo.svg";
@@ -99,7 +99,7 @@ export default function TaskListCard({ task }) {
     relativeTime: longhandRelative,
   });
 
-  useState(() => {
+  useEffect(() => {
     function fetchData() {
       getTaskActivity(task._id)
         .then((data) => data.json())
@@ -118,14 +118,26 @@ export default function TaskListCard({ task }) {
         });
     }
     fetchData();
+    //eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (e.target && e.target.className.includes("ReactModal__Overlay")) {
+        return setShowDetailsModal(false);
+      }
+    };
+    if (showDetailsModal) {
+      window.addEventListener("click", handleClick);
+    }
+  }, [showDetailsModal]);
 
   return (
     <div className={styles.container} onClick={() => setShowDetailsModal(true)}>
       {showDetailsModal && (
         <TaskDetailsView
           task={task}
-          open={true}
+          open={showDetailsModal}
           onClose={() => setShowDetailsModal(false)}
         />
       )}
