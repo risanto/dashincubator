@@ -158,7 +158,6 @@ export default function TaskDetailsView({
           getBounty(task.bountyDisplayURL)
             .then((data) => data.json())
             .then((results) => {
-              console.log(task);
               setBountyData(results);
             });
         }
@@ -256,7 +255,7 @@ export default function TaskDetailsView({
                       marginLeft: "20px",
                     }}
                     onClick={() => !loading && !requested && onReserve()}
-                  > {console.log(requested)}
+                  >
                     {loading ? (
                       <CircularProgress size={12} color={"white"} />
                     ) : requested ? (
