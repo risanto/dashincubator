@@ -24,6 +24,7 @@ const useStyles = createUseStyles({
     borderRadius: "6px",
     color: "#0B0F3B",
     marginBottom: "16px",
+    cursor: "pointer",
   },
   taskTypeText: { marginLeft: "5px", fontSize: "11px", lineHeight: "12px" },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
@@ -33,6 +34,7 @@ const useStyles = createUseStyles({
       backgroundColor: "white",
       borderRadius: "6px",
       marginBottom: "16px",
+      cursor: "pointer",
     },
   },
   upperSection: {
