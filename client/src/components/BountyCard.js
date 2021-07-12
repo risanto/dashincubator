@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from "react";
+import React from "react";
 import projectIcon from "../views/ApproveConcept/images/project.svg";
 import serviceIcon from "../views/ApproveConcept/images/service.svg";
 import jobIcon from "../views/ApproveConcept/images/job.svg";
@@ -10,42 +10,19 @@ import { useHistory } from "react-router";
 import { BountyLocation } from "../Locations";
 import programmeIcon from "../views/ApproveConcept/images/programme.svg";
 import { createUseStyles } from "react-jss";
-import commentNew from "./images/commentNew.svg";
-import commentEmpty from "./images/commentEmpty.svg";
 
 const useStyles = createUseStyles({
   container: {
-    padding: 12,
+    padding: "12px",
     backgroundColor: "white",
-    borderRadius: 6,
+    borderRadius: "6px",
     color: "#0B0F3B",
     cursor: "pointer",
-    marginBottom: 16,
+    marginBottom: "16px",
   },
-  bountyTypeText: {
-    marginLeft: 5,
-    fontSize: 11,
-    lineHeight: "12px"
-  },
-  bountyTaskStatus: {
-    fontSize: 10,
-  },
-  bountyStatus: {
-    backgroundColor: "#E0E0E0",
-    borderRadius: 3,
-    padding: "2px 6px",
-    fontSize: 10,
-    lineHeight: "12px",
-    textTransform: "uppercase",
-    marginLeft: 10,
-    fontWeight: 600,
-  },
+  bountyTypeText: { marginLeft: "5px", fontSize: "11px", lineHeight: "12px" },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
-    bountyTypeText: {
-      marginLeft: 8,
-      fontSize: 11,
-      lineHeight: "12px"
-    },
+    bountyTypeText: { marginLeft: "8px", fontSize: "11px", lineHeight: "12px" },
     container: {
       padding: "16px",
       backgroundColor: "white",
@@ -74,15 +51,6 @@ export default function BountyCard({ bounty, search }) {
   );
 
   const history = useHistory();
-
-  const completedTasks = useMemo(() => {
-    return bounty.tasks.filter(task => task.status.toLowerCase() === "completed").length;
-  }, [bounty]);
-
-  const unreadComments = useMemo(() => {
-    return bounty.comments.filter(comment => !comment.lastViewedAt);
-  }, [bounty]);
-
   return (
     <div
       className={styles.container}
@@ -200,20 +168,29 @@ export default function BountyCard({ bounty, search }) {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
           alignItems: "center",
-          marginTop: "10px"
         }}
       >
-        <div className={styles.bountyTaskStatus}>{completedTasks}/{bounty.tasks.length} Tasks Completed</div>
+        <div />
         <div
-          style={{ display: "flex", alignItems: "center", marginRight: 8 }}
+          style={{ display: "flex", alignItems: "center", marginTop: "10px" }}
         >
-          <div className={styles.bountyStatus}>
+          <div
+            style={{
+              backgroundColor: "#E0E0E0",
+              borderRadius: "3px",
+              padding: "2px 6px",
+              fontSize: "10px",
+              lineHeight: "12px",
+              textTransform: "uppercase",
+              marginLeft: "10px",
+              fontWeight: 600,
+            }}
+          >
             {bounty.status}
           </div>
         </div>
-        <img src={unreadComments.length > 0 ? commentNew : commentEmpty } style={{width: 16}} alt="comments-new" />
       </div>
     </div>
   );
