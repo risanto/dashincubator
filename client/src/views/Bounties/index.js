@@ -249,7 +249,7 @@ export default function BountiesView({ match }) {
             )
             : true);
     });
-  }, [bounties, searchTypes, searchStatus, searchAdmins]);
+  }, [bounties, search, searchTypes, searchStatus, searchAdmins]);
 
   const modifyStatus = useCallback((status) => {
     const newStatus = searchStatus.slice();
