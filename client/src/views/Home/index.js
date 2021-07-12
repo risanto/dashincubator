@@ -290,8 +290,8 @@ export default function HomeView({ match }) {
                       No tasks found
                     </div>
                   ) : (
-                    filteredOpenTasks.map((task, idx) => {
-                      return <TaskListCard key={idx} task={task} />;
+                    filteredOpenTasks.map((taskData, idx) => {
+                      return <TaskListCard key={idx} taskData={taskData} />;
                     })
                   )}
                 </div>

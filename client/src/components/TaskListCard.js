@@ -9,7 +9,13 @@ import productIcon from "./images/productIcon.svg";
 import qualityIcon from "./images/qualityIcon.svg";
 
 import { getTaskActivity } from "../api/tasksApi";
+
 import TaskDetailsView from "../views/TaskDetails";
+import ReviewTaskView from "../views/ReviewTask";
+import CompleteTaskView from "../views/CompleteTask";
+import CompleteJobView from "../views/CompleteJob";
+import EditTaskView from "../views/EditTask";
+import ReviewJobView from "../views/ReviewJob";
 
 import moment from "moment";
 import { longhandRelative, Breakpoints } from "../utils/utils";
@@ -87,13 +93,21 @@ const useStyles = createUseStyles({
   },
 });
 
-export default function TaskListCard({ task }) {
+export default function TaskListCard({ taskData }) {
   const { loggedInUser } = useGlobalState();
   const styles = useStyles();
   const history = useHistory();
 
+  const [task, setTask] = useState(taskData);
   const [unseenComments, setUnseenComments] = useState(0);
+  const [completionID, setCompletionID] = useState(null);
+
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showCompleteJobModal, setShowCompleteJobModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showJobReviewModal, setShowJobReviewModal] = useState(false);
 
   moment.updateLocale("en", {
     relativeTime: longhandRelative,
@@ -108,7 +122,7 @@ export default function TaskListCard({ task }) {
 
           for (let i = 0; i < results.length; i++) {
             // if the current logged in user doesn't exist in activity's last view, add to the unseen comments
-            if (!results[i].lastView?.[loggedInUser.username]) {
+            if (!results[i].lastView?.[loggedInUser?.username]) {
               unseen++;
             }
           }
@@ -125,6 +139,88 @@ export default function TaskListCard({ task }) {
           task={task}
           open={showDetailsModal}
           onClose={() => setShowDetailsModal(false)}
+          onReview={() => {
+            setShowDetailsModal(false);
+            setShowReviewModal(true);
+          }}
+          onComplete={() => {
+            setShowDetailsModal(false);
+            setShowCompleteModal(true);
+          }}
+          onJobComplete={() => {
+            setShowDetailsModal(false);
+            setShowCompleteJobModal(true);
+          }}
+          onEdit={() => {
+            setShowDetailsModal(false);
+            setShowEditModal(true);
+          }}
+          onJobReview={(e, item) => {
+            setCompletionID(item);
+            setShowDetailsModal(false);
+            setShowJobReviewModal(true);
+          }}
+        />
+      )}
+      {showReviewModal && (
+        <ReviewTaskView
+          task={task}
+          open={showReviewModal}
+          onClose={(e, data) => {
+            setShowReviewModal(false);
+            if (data) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      {showCompleteModal && (
+        <CompleteTaskView
+          task={task}
+          open={showCompleteModal}
+          onClose={(e, data) => {
+            setShowCompleteModal(false);
+            if (data) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      {showCompleteJobModal && (
+        <CompleteJobView
+          task={task}
+          open={showCompleteJobModal}
+          onClose={(e, data) => {
+            setShowCompleteJobModal(false);
+            if (data) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      {showEditModal && (
+        <EditTaskView
+          task={task}
+          open={showEditModal}
+          onClose={(e, submit, data) => {
+            setShowEditModal(false);
+            if (submit) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      {showJobReviewModal && (
+        <ReviewJobView
+          task={task}
+          completionID={completionID}
+          open={showJobReviewModal}
+          onClose={(e, data) => {
+            setShowJobReviewModal(false);
+            if (data) {
+              setTask(data);
+            }
+          }}
         />
       )}
       <div
