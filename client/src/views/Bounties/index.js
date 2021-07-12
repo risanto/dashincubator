@@ -3,7 +3,6 @@ import {isMobile} from "react-device-detect";
 import { withStyles } from '@material-ui/core/styles';
 import {createUseStyles} from "react-jss";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import SwipeableViews from 'react-swipeable-views';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from "@material-ui/core/Tab";
 
@@ -503,7 +502,7 @@ export default function BountiesView({ match }) {
             <StyledTab label="All" />
           </StyledTabs>
           {
-            activeTab == 0 &&
+            activeTab === 0 &&
               <div className={styles.tabContainer}>
                 {renderFilterArea()}
                 <div
@@ -541,7 +540,7 @@ export default function BountiesView({ match }) {
               </div>
           }
           {
-            activeTab == 1 &&
+            activeTab === 1 &&
             <div>
               {renderFilterArea()}
             </div>
