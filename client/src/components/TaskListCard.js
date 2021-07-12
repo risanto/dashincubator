@@ -117,7 +117,7 @@ export default function TaskListCard({ task }) {
   }, [showDetailsModal]);
 
   return (
-    <div className={styles.container}>
+    <>
       {showDetailsModal && (
         <TaskDetailsView
           task={task}
@@ -125,90 +125,97 @@ export default function TaskListCard({ task }) {
           onClose={() => setShowDetailsModal(false)}
         />
       )}
-      <div className={styles.upperSection}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div
-            className={styles.iconBox}
-            style={{
-              backgroundColor:
-                task.taskType === "spec"
-                  ? "#EF8144"
-                  : task.taskType === "production"
-                  ? "#4452EF"
-                  : task.taskType === "qa"
-                  ? "#00B6F0"
-                  : "#AD1D73",
-            }}
-          >
-            <img
-              src={
-                task.taskType === "spec"
-                  ? checklistIcon
-                  : task.taskType === "production"
-                  ? productIcon
-                  : task.taskType === "qa"
-                  ? qualityIcon
-                  : null
+      <div
+        className={styles.container}
+        onClick={() => setShowDetailsModal(true)}
+      >
+        <div className={styles.upperSection}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div
+              className={styles.iconBox}
+              style={{
+                backgroundColor:
+                  task.taskType === "spec"
+                    ? "#EF8144"
+                    : task.taskType === "production"
+                    ? "#4452EF"
+                    : task.taskType === "qa"
+                    ? "#00B6F0"
+                    : "#AD1D73",
+              }}
+            >
+              <img
+                src={
+                  task.taskType === "spec"
+                    ? checklistIcon
+                    : task.taskType === "production"
+                    ? productIcon
+                    : task.taskType === "qa"
+                    ? qualityIcon
+                    : null
+                }
+                style={{ width: "12px" }}
+                alt="icon"
+              />
+            </div>
+            <div className={styles.taskTypeText}>
+              {task.taskType === "spec"
+                ? "Spec"
+                : task.taskType === "production"
+                ? "Production"
+                : task.taskType === "qa"
+                ? "QA"
+                : null}
+            </div>
+          </div>
+          <div className={styles.age}>
+            <div>Created {moment(task.dateCreated).fromNow()}</div>
+          </div>
+        </div>
+
+        <div className={styles.description}>{task.description}</div>
+
+        <div className={styles.lowerSection}>
+          <div style={{ display: "flex" }}>
+            <img src={dashLogo} alt="dash" />
+            <div className={styles.dashPayout}>{task.payout} DASH</div>
+            <div
+              className={styles.bountyLink}
+              onClick={() =>
+                history.push(BountyLocation(task.bountyDisplayURL))
               }
-              style={{ width: "12px" }}
-              alt="icon"
-            />
+            >
+              {task.bountyTitle}
+            </div>
           </div>
-          <div className={styles.taskTypeText}>
-            {task.taskType === "spec"
-              ? "Spec"
-              : task.taskType === "production"
-              ? "Production"
-              : task.taskType === "qa"
-              ? "QA"
-              : null}
-          </div>
-        </div>
-        <div className={styles.age}>
-          <div>Created {moment(task.dateCreated).fromNow()}</div>
-        </div>
-      </div>
-
-      <div className={styles.description}>{task.description}</div>
-
-      <div className={styles.lowerSection}>
-        <div style={{ display: "flex" }}>
-          <img src={dashLogo} alt="dash" />
-          <div className={styles.dashPayout}>{task.payout} DASH</div>
-          <div
-            className={styles.bountyLink}
-            onClick={() => history.push(BountyLocation(task.bountyDisplayURL))}
-          >
-            {task.bountyTitle}
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
+          <div style={{ display: "flex", alignItems: "center" }}>
             <div
               style={{
-                marginRight: "12px",
-                cursor: "pointer",
                 display: "flex",
+                alignItems: "center",
               }}
-              onClick={() => setShowDetailsModal(true)}
             >
-              <div style={{ marginRight: "6px", fontSize: "11px" }}>
-                {unseenComments > 0 && unseenComments}
+              <div
+                style={{
+                  marginRight: "12px",
+                  cursor: "pointer",
+                  display: "flex",
+                }}
+                onClick={() => setShowDetailsModal(true)}
+              >
+                <div style={{ marginRight: "6px", fontSize: "11px" }}>
+                  {unseenComments > 0 && unseenComments}
+                </div>
+                <img
+                  alt={"comment"}
+                  src={unseenComments === 0 ? commentEmpty : commentNew}
+                  style={{ width: 16 }}
+                />
               </div>
-              <img
-                alt={"comment"}
-                src={unseenComments === 0 ? commentEmpty : commentNew}
-                style={{ width: 16 }}
-              />
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
