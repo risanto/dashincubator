@@ -15,7 +15,7 @@ import {
   DashboardLocation,
   UserManagementLocation,
   ResetPasswordLocation,
-  UpdatePasswordLocation, BountiesLocation,
+  UpdatePasswordLocation,
 } from "./Locations";
 import ScrollToTop from "./utils/ScrollToTop";
 import useGlobalState from "./state";
@@ -34,7 +34,6 @@ import DashboardView from "./views/Dashboard";
 import UserManagementView from "./views/UserManagement";
 import ResetPasswordView from "./views/ResetPassword";
 import UpdatePasswordView from "./views/UpdatePassword";
-import BountiesView from "./views/Bounties";
 
 function isAuthMatch(withAuth, loggedInUser, token) {
   if (!withAuth) {
@@ -78,12 +77,6 @@ const routes = [
     exact: true,
     withAuth: true,
     component: ConceptsView,
-  },
-  {
-    path: BountiesLocation,
-    exact: true,
-    withAuth: true,
-    component: BountiesView,
   },
   {
     path: RequestNewConceptLocation,
