@@ -1,5 +1,10 @@
 import { dashincubatorRequest, RequestTypes } from "./serverRequest";
 
+export const fetchOpenTasks = async () => {
+  const response = await dashincubatorRequest(`tasks/open`, RequestTypes.Get);
+  return response.json();
+};
+
 export const getTask = async (id) =>
   dashincubatorRequest(`tasks/get/${id}`, RequestTypes.Get);
 
@@ -11,6 +16,9 @@ export const createTask = async (task, bountyID) =>
 
 export const updateTask = (data) =>
   dashincubatorRequest(`tasks/update`, RequestTypes.Put, data);
+
+export const updateTaskActivityView = (id) =>
+  dashincubatorRequest(`tasks/activity-viewed/${id}`, RequestTypes.Put);
 
 export const requestToReserveTask = (user, taskId) => {
   dashincubatorRequest(

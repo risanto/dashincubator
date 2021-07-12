@@ -1,0 +1,12 @@
+<svg width="44" height="60" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="402" width="582" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <path fill-rule="evenodd" fill="#ffffff" id="clipboard-2" d="m10,2l4,0a2,2 0 0 1 2,-2l12,0a2,2 0 0 1 2,2l4,0l0,4l-24,0l0,-4z" class="cls-1"/>
+  <path fill="#ffffff" fill-rule="evenodd" id="clipboard_copy" d="m33.172,49.172a3.982,3.982 0 0 0 -1.172,2.828l0,8l-28,0a4,4 0 0 1 -4,-4l0,-50a4,4 0 0 1 4,-4l2,0l0,6a2,2 0 0 0 2,2l28,0a2,2 0 0 0 2,-2l0,-6l2,0a4,4 0 0 1 4,4l0,42m-8,12l0,-8l8,0l-8,8zm-24,-42l20,0a2,2 0 0 1 0,4l-20,0a2,2 0 0 1 0,-4zm0,10l20,0a2,2 0 0 1 0,4l-20,0a2,2 0 0 1 0,-4zm0,10l20,0a2,2 0 0 1 0,4l-20,0a2,2 0 0 1 0,-4z" class="cls-2"/>
+ </g>
+</svg>
