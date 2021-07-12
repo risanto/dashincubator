@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router";
 import { createUseStyles } from "react-jss";
+import useGlobalState from "../../state";
 
 import {
   commentTask,
@@ -12,15 +14,15 @@ import { getBounty } from "../../api/bountiesApi";
 import { CircularProgress } from "@material-ui/core";
 import DashModal from "../../components/DashModal";
 import UserAvatar from "../../components/UserAvatar";
-import useGlobalState from "../../state";
+import ActivityItem from "../../components/ActivityItem";
+import Textarea from "../../components/Textarea";
+
+import { ProfileLocation, BountyLocation } from "../../Locations";
+import { Breakpoints } from "../../utils/utils";
+
 import dashLogo from "./images/dashWhite.svg";
 import doneIcon from "../Concept/images/done.svg";
-import ActivityItem from "../../components/ActivityItem";
-import { ProfileLocation } from "../../Locations";
-import { useHistory } from "react-router";
-import Textarea from "../../components/Textarea";
 import moment from "moment";
-import { Breakpoints } from "../../utils/utils";
 
 const useStyles = createUseStyles({
   assignment: {
@@ -107,6 +109,16 @@ const useStyles = createUseStyles({
       overflowWrap: "normal",
       wordWrap: "normal",
       wordBreak: "normal",
+    },
+  },
+  bountyLink: {
+    fontSize: "11px",
+    textDecoration: "underline",
+    fontWeight: 500,
+    cursor: "pointer",
+    marginLeft: "24px",
+    "&:hover": {
+      color: "aliceblue",
     },
   },
 });
@@ -387,62 +399,77 @@ export default function TaskDetailsView({
           <div
             style={{
               display: "flex",
+              justifyContent: "space-between",
               alignItems: "center",
               marginTop: "32px",
             }}
           >
-            <img src={dashLogo} alt="dash" />
-            <div
-              style={{
-                marginLeft: "10px",
-                fontWeight: 600,
-                fontSize: "12px",
-                lineHeight: "15px",
-              }}
-            >
-              {task.payout} DASH
-            </div>
-            <div style={{ marginLeft: "10px" }}>
-              {task.assignee ? (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <div className={styles.assignment}>
-                    {task.status === "complete"
-                      ? "Completed by"
-                      : "Assigned to"}
-                  </div>
+            <div style={{ display: "flex" }}>
+              <img src={dashLogo} alt="dash" />
+              <div
+                style={{
+                  marginLeft: "10px",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  lineHeight: "15px",
+                }}
+              >
+                {task.payout} DASH
+              </div>
+              <div style={{ marginLeft: "10px" }}>
+                {task.assignee ? (
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      cursor: "pointer",
                     }}
-                    onClick={() =>
-                      history.push(ProfileLocation(task.assignee.usernname))
-                    }
                   >
-                    <UserAvatar
-                      size={18}
-                      fontSize={"8px"}
-                      lineHeight={"10px"}
-                      user={task.assignee}
-                    />
-                    <div className={styles.assignee}>
-                      {task.assignee.username}
+                    <div className={styles.assignment}>
+                      {task.status === "complete"
+                        ? "Completed by"
+                        : "Assigned to"}
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        history.push(ProfileLocation(task.assignee.usernname))
+                      }
+                    >
+                      <UserAvatar
+                        size={18}
+                        fontSize={"8px"}
+                        lineHeight={"10px"}
+                        user={task.assignee}
+                      />
+                      <div className={styles.assignee}>
+                        {task.assignee.username}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div
-                  style={{ opacity: 0.5, fontSize: "12px", lineHeight: "15px" }}
-                >
-                  Unassigned
-                </div>
-              )}
+                ) : (
+                  <div
+                    style={{
+                      opacity: 0.5,
+                      fontSize: "12px",
+                      lineHeight: "15px",
+                    }}
+                  >
+                    Unassigned
+                  </div>
+                )}
+              </div>
+            </div>
+            <div
+              className={styles.bountyLink}
+              onClick={() =>
+                history.push(BountyLocation(task.bountyDisplayURL))
+              }
+            >
+              {task.bountyTitle}
             </div>
           </div>
         </div>
