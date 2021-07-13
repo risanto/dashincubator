@@ -2,7 +2,7 @@
 
 You can refer to the `.env.example` file to setup your local development.
 
-To use production database, you should change the `MONGO_URL` to `proddburl`.
+To use production database, you should change the `MONGO_URL` to `<MONGO_URL>/?retryWrites=true&w=majority`.
 
 If you want to setup your local database, you should update your standalone mongodb instance to support replica sets. (No need to update if your mongo instance already supports replica sets.)
 
