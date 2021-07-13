@@ -126,7 +126,7 @@ const useStyles = createUseStyles({
   },
 });
 
-export default function DashboardView({ match }) {
+export default function MyTasksView({ match }) {
   const [notifications, setNotifications] = useState(null);
   const [dashboardItems, setDashboardItems] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -173,7 +173,7 @@ export default function DashboardView({ match }) {
     <MainLayout match={match}>
       <div className={styles.container}>
         <div style={{ width: "100%" }}>
-          <div className={styles.header}>DASHBOARD</div>
+          <div className={styles.header}>MY TASKS</div>
           <div style={{ marginTop: "32px", color: "white", fontSize: "18px" }}>
             {dashboardLoading || !dashboardItems ? (
               <div style={{ display: "flex", justifyContent: "center" }}>
