@@ -42,40 +42,6 @@ router.get(
   })
 );
 
-router.get(
-  "/me",
-  ...authHandlers(async (req, res) => {
-    const { email: me } = req.tokenPayload;
-    bountiesCollection
-      .find({
-        $or: [
-          {
-            $and: [
-              { type: "bounty" },
-              {
-                $or: [
-                  { "primaryAdmin.email": me },
-                  { "secondaryAdmin.eamil": me },
-                ]
-              }
-            ]
-          },
-          {
-            $and: [
-              { type: "concept" },
-              { "user.email": me },
-            ]
-          }
-        ]
-      })
-      .toArray((err, bounties) => {
-        res.send(
-          bounties.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
-        );
-      })
-  })
-)
-
 router.put(
   "/comment/:id",
   ...authHandlers(async (req, res) => {

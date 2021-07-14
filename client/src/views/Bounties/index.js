@@ -17,6 +17,7 @@ import caretDownIcon from "../Home/images/caretDown.svg";
 import MainLayout from "../../layouts/MainLayout";
 import caretDown from "../Home/images/caretDown.svg";
 import {getAdminsSimple} from "../../api/usersApi";
+import useGlobalState from "../../state";
 
 const useStyles = createUseStyles({
   container: {
@@ -194,6 +195,7 @@ export default function BountiesView({ match }) {
   const [loading, setLoading] = useState(false);
   const [bounties, setBounties] = useState([]);
   const [admins, setAdmins] = useState([]);
+  const { loggedInUser } = useGlobalState();
   const catRef = useRef();
   const typeRef = useRef();
   const adminRef = useRef();
@@ -204,10 +206,11 @@ export default function BountiesView({ match }) {
 
   useEffect(() => {
     setLoading(true);
-    fetchBounties().then((results) => {
+    (async () => {
+      const allBounties = await fetchBounties();
+      setBounties(allBounties);
       setLoading(false);
-      setBounties(results);
-    });
+    })();
   }, []);
 
   useEffect(() => {
@@ -230,7 +233,7 @@ export default function BountiesView({ match }) {
       (admin) =>
         bounties.findIndex(
           (bounty) =>
-            ((bounty.user && bounty.user.username === admin.username) || (bounty.primaryAdmin && (bounty.primaryAdmin.username === admin.username)) || (bounty.secondaryAdmin && (bounty.secondaryAdmin.username === admin.username))) &&
+            ((bounty.primaryAdmin && (bounty.primaryAdmin.username === admin.username)) || (bounty.secondaryAdmin && (bounty.secondaryAdmin.username === admin.username))) &&
             searchStatus.includes(bounty.status) && searchTypes.includes(bounty.bountyType)
         ) >= 0
     );
@@ -244,12 +247,32 @@ export default function BountiesView({ match }) {
           (searchAdmins.length > 0
             ? (
               (bounty.primaryAdmin && searchAdmins.find(admin => admin.username === bounty.primaryAdmin.username)) ||
-              (bounty.secondaryAdmin && searchAdmins.find(admin => admin.username === bounty.secondaryAdmin.username)) ||
-              (bounty.user && searchAdmins.find(admin => admin.username === bounty.user.username))
+              (bounty.secondaryAdmin && searchAdmins.find(admin => admin.username === bounty.secondaryAdmin.username))
             )
             : true);
     });
   }, [bounties, search, searchTypes, searchStatus, searchAdmins]);
+
+  const myBounties = useMemo(() => {
+    return filteredBounties.filter((bounty) => {
+      return (bounty.primaryAdmin && bounty.primaryAdmin.username === loggedInUser.username) ||
+        (bounty.secondaryAdmin && bounty.secondaryAdmin.username === loggedInUser.username) ||
+        (bounty.user && bounty.user.username === loggedInUser.username);
+    });
+  }, [filteredBounties, loggedInUser]);
+
+  const myFilteredAdmins = useMemo(() => {
+    return filteredAdmins.filter(
+      (admin) =>
+        myBounties.findIndex(
+          (bounty) =>
+            ((bounty.user && (bounty.user.username === admin.username)) ||
+              (bounty.primaryAdmin && (bounty.primaryAdmin.username === admin.username)) ||
+              (bounty.secondaryAdmin && (bounty.secondaryAdmin.username === admin.username))
+            )
+        ) >= 0
+    );
+  }, [filteredAdmins, myBounties]);
 
   const modifyStatus = useCallback((status) => {
     const newStatus = searchStatus.slice();
@@ -307,188 +330,6 @@ export default function BountiesView({ match }) {
           : null
   }, []);
 
-  const renderFilterArea = () => (
-    <div className={styles.searchContainer}>
-      <div className={styles.searchIconContainer}>
-        <img
-          src={searchIcon}
-          alt="search"
-          className={styles.searchIcon}
-        />
-        <input
-          value={search}
-          onChange={handleSearchChange}
-          placeholder={"Find a bounty"}
-          className={styles.searchInput}
-        />
-      </div>
-      <div className={styles.filtersWrapper}>
-        <div
-          className={styles.filterContainer}
-          onClick={() => setSearchingTypes(true)}
-        >
-          {searchingTypes && (
-            <div
-              style={{
-                width: "106px",
-              }}
-              className={styles.filterItemsContainer}
-              ref={typeRef}
-            >
-              {bountyTypes.map((tag, i) => (
-                <div
-                  className={styles.filterItemWrapper}
-                  key={`bounty-type-${i}`}
-                  onClick={modifyType(tag)}
-                >
-                  <img
-                    src={
-                      searchTypes.find((cat) => cat === tag)
-                        ? checked
-                        : check
-                    }
-                    alt="check"
-                    style={{
-                      marginRight: "6px",
-                      width: "16px",
-                      height: "16px",
-                    }}
-                  />
-                  {getTag(tag)}
-                </div>
-              ))}
-            </div>
-          )}
-          <img
-            src={caretDownIcon}
-            alt="dropdown"
-            className={styles.filterCaret}
-            style={{
-              width: "9px",
-              marginRight: "8px",
-              transform: searchingTypes
-                ? "rotate(-180deg)"
-                : "rotate(0deg)",
-            }}
-          />
-          <div
-            style={{
-              fontWeight: 600,
-              color: "white",
-              fontSize: "12px",
-              lineHeight: "15px",
-            }}
-          >
-            {isMobile ? "Types" : "Filter types"}
-          </div>
-        </div>
-        <div style={{ position: "relative", marginLeft: "20px" }}>
-          {searchingStatus && (
-            <div
-              style={{
-                width: "100px",
-              }}
-              className={styles.filterItemsContainer}
-              ref={catRef}
-            >
-              {bountyStatus.map((tag, i) => (
-                <div
-                  className={styles.filterItemWrapper}
-                  key={`bounty-status-${i}`}
-                  onClick={() => modifyStatus(tag)}
-                >
-                  <img
-                    src={
-                      searchStatus.find((cat) => cat === tag)
-                        ? checked
-                        : check
-                    }
-                    alt="check"
-                    className={styles.checkBox}
-                  />
-                  {tag === "active"
-                    ? "Active"
-                    : tag === "paused"
-                      ? "Paused"
-                      : "Completed"}
-                </div>
-              ))}
-            </div>
-          )}
-          <div
-            className={styles.filterOuterWrapper}
-            onClick={() => setSearchingStatus(true)}
-          >
-            <img
-              src={caretDownIcon}
-              alt="dropdown"
-              style={{
-                transform: searchingStatus
-                  ? "rotate(-180deg)"
-                  : "rotate(0deg)",
-              }}
-              className={styles.filterCaret}
-            />
-            <div
-              style={{
-                fontWeight: 600,
-                color: "white",
-                fontSize: "12px",
-                lineHeight: "15px",
-              }}
-            >
-              {isMobile ? "Status" : "Filter status"}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={styles.dropdownContainer}
-          style={{
-            marginLeft: isMobile ? "8px" : "20px",
-            paddingRight: "9px",
-          }}
-          onClick={() => setSearchingAdmins(true)}
-        >
-          {searchingAdmins && (
-            <div className={styles.dropdownContent} ref={adminRef}>
-              {filteredAdmins.map((tag, i) => (
-                <div
-                  style={{
-                    marginTop: i > 0 && "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    userSelect: "none",
-                  }}
-                  onClick={modifyAdmins(tag)}
-                  key={`concept-creator-${i}`}
-                >
-                  <img
-                    src={
-                      searchAdmins.find((cat) => cat === tag) ? checked : check
-                    }
-                    alt="check"
-                    style={{
-                      marginRight: 6,
-                      width: 16,
-                      height: 16,
-                    }}
-                  />
-                  {tag.username}
-                </div>
-              ))}
-            </div>
-          )}
-          <img src={caretDown} alt="dropdown" />
-          <div style={{ marginLeft: "8px" }}>
-            {isMobile ? "Admins" : "Filter admins"}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <MainLayout match={match}>
       <div className={styles.container}>
@@ -501,50 +342,219 @@ export default function BountiesView({ match }) {
             <StyledTab label="My Bounties" />
             <StyledTab label="All" />
           </StyledTabs>
-          {
-            activeTab === 0 &&
-              <div className={styles.tabContainer}>
-                {renderFilterArea()}
+          <div className={styles.tabContainer}>
+            <div className={styles.searchContainer}>
+              <div className={styles.searchIconContainer}>
+                <img
+                  src={searchIcon}
+                  alt="search"
+                  className={styles.searchIcon}
+                />
+                <input
+                  value={search}
+                  onChange={handleSearchChange}
+                  placeholder={"Find a bounty"}
+                  className={styles.searchInput}
+                />
+              </div>
+              <div className={styles.filtersWrapper}>
                 <div
-                  style={{
-                    marginTop: "16px",
-                  }}
+                  className={styles.filterContainer}
+                  onClick={() => setSearchingTypes(true)}
                 >
-                  {loading ? (
+                  {searchingTypes && (
                     <div
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginTop: "32px",
+                        width: "106px",
                       }}
+                      className={styles.filterItemsContainer}
+                      ref={typeRef}
                     >
-                      <CircularProgress style={{ color: "white" }} />
+                      {bountyTypes.map((tag, i) => (
+                        <div
+                          className={styles.filterItemWrapper}
+                          key={`bounty-type-${i}`}
+                          onClick={modifyType(tag)}
+                        >
+                          <img
+                            src={
+                              searchTypes.find((cat) => cat === tag)
+                                ? checked
+                                : check
+                            }
+                            alt="check"
+                            style={{
+                              marginRight: "6px",
+                              width: "16px",
+                              height: "16px",
+                            }}
+                          />
+                          {getTag(tag)}
+                        </div>
+                      ))}
                     </div>
-                  ) : search && filteredBounties.length === 0 ? (
+                  )}
+                  <img
+                    src={caretDownIcon}
+                    alt="dropdown"
+                    className={styles.filterCaret}
+                    style={{
+                      width: "9px",
+                      marginRight: "8px",
+                      transform: searchingTypes
+                        ? "rotate(-180deg)"
+                        : "rotate(0deg)",
+                    }}
+                  />
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      color: "white",
+                      fontSize: "12px",
+                      lineHeight: "15px",
+                    }}
+                  >
+                    {isMobile ? "Types" : "Filter types"}
+                  </div>
+                </div>
+                <div style={{ position: "relative", marginLeft: "20px" }}>
+                  {searchingStatus && (
                     <div
                       style={{
+                        width: "100px",
+                      }}
+                      className={styles.filterItemsContainer}
+                      ref={catRef}
+                    >
+                      {bountyStatus.map((tag, i) => (
+                        <div
+                          className={styles.filterItemWrapper}
+                          key={`bounty-status-${i}`}
+                          onClick={() => modifyStatus(tag)}
+                        >
+                          <img
+                            src={
+                              searchStatus.find((cat) => cat === tag)
+                                ? checked
+                                : check
+                            }
+                            alt="check"
+                            className={styles.checkBox}
+                          />
+                          {tag === "active"
+                            ? "Active"
+                            : tag === "paused"
+                              ? "Paused"
+                              : "Completed"}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div
+                    className={styles.filterOuterWrapper}
+                    onClick={() => setSearchingStatus(true)}
+                  >
+                    <img
+                      src={caretDownIcon}
+                      alt="dropdown"
+                      style={{
+                        transform: searchingStatus
+                          ? "rotate(-180deg)"
+                          : "rotate(0deg)",
+                      }}
+                      className={styles.filterCaret}
+                    />
+                    <div
+                      style={{
+                        fontWeight: 600,
                         color: "white",
                         fontSize: "12px",
-                        textAlign: "center",
-                        marginTop: "32px",
+                        lineHeight: "15px",
                       }}
                     >
-                      No bounties found
+                      {isMobile ? "Status" : "Filter status"}
                     </div>
-                  ) : (
-                    filteredBounties.map((bounty, index) => (
-                      <BountyCard bounty={bounty} search={search} key={`bounty-card-${index}`} />
-                    ))
+                  </div>
+                </div>
+
+                <div
+                  className={styles.dropdownContainer}
+                  style={{
+                    marginLeft: isMobile ? "8px" : "20px",
+                    paddingRight: "9px",
+                  }}
+                  onClick={() => setSearchingAdmins(true)}
+                >
+                  {searchingAdmins && (
+                    <div className={styles.dropdownContent} ref={adminRef}>
+                      {(activeTab === 0 ? myFilteredAdmins : filteredAdmins).map((tag, i) => (
+                        <div
+                          style={{
+                            marginTop: i > 0 && "8px",
+                            display: "flex",
+                            alignItems: "center",
+                            cursor: "pointer",
+                            userSelect: "none",
+                          }}
+                          onClick={modifyAdmins(tag)}
+                          key={`concept-creator-${i}`}
+                        >
+                          <img
+                            src={
+                              searchAdmins.find((cat) => cat === tag) ? checked : check
+                            }
+                            alt="check"
+                            style={{
+                              marginRight: 6,
+                              width: 16,
+                              height: 16,
+                            }}
+                          />
+                          {tag.username}
+                        </div>
+                      ))}
+                    </div>
                   )}
+                  <img src={caretDown} alt="dropdown" />
+                  <div style={{ marginLeft: "8px" }}>
+                    {isMobile ? "Admins" : "Filter admins"}
+                  </div>
                 </div>
               </div>
-          }
-          {
-            activeTab === 1 &&
-            <div>
-              {renderFilterArea()}
             </div>
-          }
+            <div style={{ marginTop: 16 }}>
+              {loading ? (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: 32,
+                  }}
+                >
+                  <CircularProgress style={{ color: "white" }} />
+                </div>
+              ) : search && filteredBounties.length === 0 ? (
+                <div
+                  style={{
+                    color: "white",
+                    fontSize: 12,
+                    textAlign: "center",
+                    marginTop: 32,
+                  }}
+                >
+                  No bounties found
+                </div>
+              ) : (
+                activeTab === 0
+                  ? myBounties.map((bounty, index) => (
+                    <BountyCard bounty={bounty} search={search} key={`bounty-card-${index}`} />
+                  ))
+                  : filteredBounties.map((bounty, index) => (
+                    <BountyCard bounty={bounty} search={search} key={`bounty-card-${index}`} />
+                  ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </MainLayout>
