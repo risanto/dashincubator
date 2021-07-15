@@ -1,7 +1,8 @@
 import React, {useMemo} from "react";
+import ReactDOMServer from "react-dom/server";
 import moment from "moment";
 import UserAvatar from "./UserAvatar";
-import {longhandRelative, Breakpoints, getHighlightedText} from "../utils/utils";
+import {longhandRelative, Breakpoints, truncate, getHighlightedText} from "../utils/utils";
 import { useHistory } from "react-router";
 import { BountyLocation } from "../Locations";
 import { createUseStyles } from "react-jss";
@@ -46,6 +47,11 @@ const useStyles = createUseStyles({
     fontSize: 11,
     lineHeight: "12px",
   },
+  bountyDescription: {
+    fontSize: 12,
+    lineHeight: "18px",
+    margin: "8px 0",
+  },
   [`@media (min-width: ${Breakpoints.lg}px)`]: {
     bountyTypeText: {
       marginLeft: 8,
@@ -67,6 +73,16 @@ export default function BountyCard({ bounty, search }) {
   moment.updateLocale("en", {
     relativeTime: longhandRelative,
   });
+
+  const highlightedValueProposition = ReactDOMServer.renderToStaticMarkup(
+    getHighlightedText(
+      search &&
+      bounty.valueProposition.toUpperCase().includes(search.toUpperCase())
+        ? bounty.valueProposition.replace(/<[^>]*>?/gm, "")
+        : truncate(bounty.valueProposition, 170).replace(/<[^>]*>?/gm, ""),
+      search
+    )
+  );
 
   const history = useHistory();
 
@@ -91,11 +107,17 @@ export default function BountyCard({ bounty, search }) {
         <img src={unreadComments.length > 0 ? commentNew : commentEmpty } style={{width: 12, marginLeft: 4}} alt="comments-new" />
         <div className={styles.bountyCreatedAt}> • {moment(bounty.approvedDate).format("D, MMM YYYY")}</div>
       </div>
+      <div
+        className={styles.bountyDescription}
+        dangerouslySetInnerHTML={{
+          __html: highlightedValueProposition,
+        }}
+      />
       <div className={styles.bountyAdminsWrapper}>
         {bounty.primaryAdmin && (
           <div
             style={{
-              marginLeft: "8px",
+              marginLeft: 8,
               display: "flex",
               alignItems: "center",
             }}
