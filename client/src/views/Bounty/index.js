@@ -5,7 +5,7 @@ import { createUseStyles } from "react-jss";
 import {
   getBounty,
   getBountyActivity,
-  commentBounty, updateCommentLastSeen,
+  commentBounty,
 } from "../../api/bountiesApi";
 import MainLayout from "../../layouts/MainLayout";
 import { ProfileLocation, RootLocation } from "../../Locations";
@@ -156,7 +156,7 @@ const useStyles = createUseStyles({
       position: "relative",
       borderRadius: "4px",
     },
-    valueProposition: { flexShrink: 0, maxWidth: "516px" },
+    valueProposition: { flexShrink: 0, maxWidth: "400px" },
 
     container: {
       maxWidth: "1050px",
@@ -184,15 +184,14 @@ export default function BountyView({ match }) {
   useEffect(() => {
     getBounty(match.params.id)
       .then((result) => result.json())
-      .then(async (data) => {
+      .then((data) => {
         if (data.error) {
           history.push(RootLocation);
         } else {
           setBounty(data);
-          const newActivity = await getBountyActivity(data._id)
-            .then((result) => result.json());
-          setActivity(newActivity);
-          await updateCommentLastSeen(data._id);
+          getBountyActivity(data._id)
+            .then((result) => result.json())
+            .then((data) => setActivity(data));
         }
       });
     moment.updateLocale("en", {
@@ -207,8 +206,6 @@ export default function BountyView({ match }) {
     newBounty.tasks[taskIndex] = task;
     setBounty(newBounty);
   };
-
-  //console.log(bounty);
 
   const onComment = () => {
     if (comment.length > 0 && comment.length < 5000) {
