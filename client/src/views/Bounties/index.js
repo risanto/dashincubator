@@ -1,5 +1,8 @@
-import React, {useCallback, useEffect, useRef, useState, useMemo} from "react";
+import React, {useCallback, useEffect, useRef, useState, useMemo, useReducer} from "react";
 import {isMobile} from "react-device-detect";
+import clsx from "clsx";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import produce from "immer";
 import { withStyles } from '@material-ui/core/styles';
 import {createUseStyles} from "react-jss";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -18,19 +21,23 @@ import MainLayout from "../../layouts/MainLayout";
 import caretDown from "../Home/images/caretDown.svg";
 import {getAdminsSimple} from "../../api/usersApi";
 import useGlobalState from "../../state";
+import projectIcon from "../ApproveConcept/images/project.svg";
+import serviceIcon from "../ApproveConcept/images/service.svg";
+import jobIcon from "../ApproveConcept/images/job.svg";
+import programmeIcon from "../ApproveConcept/images/programme.svg";
 
 const useStyles = createUseStyles({
   container: {
     maxWidth: "100vw",
     margin: "auto",
     padding: "0 24px",
-    marginTop: "32px",
+    marginTop: 32,
     color: "#0B0F3B",
   },
   columnHeader: {
     fontWeight: 600,
     color: "rgba(255, 255, 255, 0.8)",
-    fontSize: "12px",
+    fontSize: 12,
     lineHeight: "15px",
     letterSpacing: "0.1em",
     userSelect: "none",
@@ -42,24 +49,24 @@ const useStyles = createUseStyles({
     width: "100%",
     color: "white",
     lineHeight: "15px",
-    fontSize: "12px",
+    fontSize: 12,
     "&::placeholder": {
       color: "rgba(255, 255, 255, 0.5)",
     },
   },
   searchContainer: {
-    marginTop: "16px",
+    marginTop: 16,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: "4px",
+    borderRadius: 4,
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
   },
   searchIcon: {
-    margin: "8px",
-    width: "12px",
-    height: "12px",
-    marginRight: "8px",
+    margin: 8,
+    width: 12,
+    height: 12,
+    marginRight: 8,
   },
   searchIconContainer: {
     flexShrink: 0,
@@ -80,13 +87,13 @@ const useStyles = createUseStyles({
     position: "relative",
   },
   filterItemsContainer: {
-    padding: "7px",
-    borderRadius: "4px",
+    padding: 7,
+    borderRadius: 4,
     backgroundColor: "#00B6F0",
     position: "absolute",
     left: 0,
-    top: "28px",
-    fontSize: "12px",
+    top: 28,
+    fontSize: 12,
     color: "white",
     zIndex: 11,
   },
@@ -128,27 +135,80 @@ const useStyles = createUseStyles({
     alignItems: "center",
     color: "white",
     fontWeight: 600,
-    fontSize: "12px",
+    fontSize: 12,
     flexShrink: 0,
     cursor: "pointer",
     userSelect: "none",
     position: "relative",
   },
   dropdownContent: {
-    padding: "7px",
-    borderRadius: "4px",
+    padding: 7,
+    borderRadius: 4,
     backgroundColor: "#00B6F0",
     position: "absolute",
     left: 0,
-    top: "28px",
-    fontSize: "12px",
+    top: 28,
+    fontSize: 12,
     color: "white",
-    width: "100px",
+    width: 100,
     zIndex: 11,
   },
-  [`@media (min-width: ${Breakpoints.sm}px)`]: {
+  dropper: {
+    margin: "0 4px",
+    padding: "0 8px",
+    maxWidth: "20%",
+    flex: 1,
+    backgroundColor: "#EBECF0",
+    borderRadius: 4,
+    "&:first-child": {
+      marginLeft: 0,
+    },
+    "&:last-child": {
+      marginRight: 0,
+    },
+  },
+  dropOver: {
+    backgroundColor: "#F4F5F7",
+  },
+  dragger: {
+    padding: 16,
+    margin: "8px 0",
+    backgroundColor: "#fff",
+    borderRadius: 4,
+    boxShadow: "rgb(0 0 0 / 10%) 0px 1px 3px 0px, rgb(0 0 0 / 6%) 0px 1px 2px 0px",
+    "&:hover": {
+      backgroundColor: "#F4F5F7",
+    },
+  },
+  dragging: {
+    backgroundColor: "#D2D6DC",
+  },
+  draggerContent: {
+    display: "flex",
+    alignItems: "center",
+  },
+  cardWrapper: {
+    display: "flex",
+    alignItems: "flex-start",
+    marginTop: 16,
+  },
+  cardTitle: {
+    display: "flex",
+    textTransform: "capitalize",
+    margin: "8px 0",
+  },
+  cardIcon: {
+    width: 20,
+    height: 20,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 3,
+    marginRight: 8,
+  },
+  [`@media (min-width: ${Breakpoints.lg}px)`]: {
     container: {
-      maxWidth: 1050,
+      maxWidth: 1600,
       margin: "auto",
       padding: "0 88px",
       marginTop: 32,
@@ -182,6 +242,25 @@ const StyledTab = withStyles((theme) => ({
   },
 }))((props) => <Tab disableRipple {...props} />);
 
+const dragReducer = produce((draft, action) => {
+  switch (action.type) {
+    case "MOVE": {
+      draft[action.from] = draft[action.from] || [];
+      draft[action.to] = draft[action.to] || [];
+      const [removed] = draft[action.from].splice(action.fromIndex, 1);
+      draft[action.to].splice(action.toIndex, 0, removed);
+      break;
+    }
+    case "SET_ITEMS": {
+      draft.project = action.payload.filter(el => el.bountyType === "project");
+      draft.job = action.payload.filter(el => el.bountyType === "job");
+      draft.service = action.payload.filter(el => el.bountyType === "service");
+      draft.programme = action.payload.filter(el => el.bountyType === "programme");
+      break;
+    }
+  }
+});
+
 export default function BountiesView({ match }) {
   const styles = useStyles();
   const [activeTab, setActiveTab] = useState(0);
@@ -199,6 +278,13 @@ export default function BountiesView({ match }) {
   const catRef = useRef();
   const typeRef = useRef();
   const adminRef = useRef();
+  const [cardState, dispatch] = useReducer(dragReducer, {
+    project: [],
+    job: [],
+    service: [],
+    programme: [],
+    completed: [],
+  });
 
   useOutsideAlerter(catRef, () => setSearchingStatus(false));
   useOutsideAlerter(typeRef, () => setSearchingTypes(false));
@@ -252,6 +338,13 @@ export default function BountiesView({ match }) {
             : true);
     });
   }, [bounties, search, searchTypes, searchStatus, searchAdmins]);
+
+  useEffect(() => {
+    dispatch({
+      type: "SET_ITEMS",
+      payload: filteredBounties,
+    });
+  }, [filteredBounties]);
 
   const myBounties = useMemo(() => {
     return filteredBounties.filter((bounty) => {
@@ -330,10 +423,34 @@ export default function BountiesView({ match }) {
           : null
   }, []);
 
+  const onDragEnd = useCallback((result) => {
+    if (result.reason === "DROP") {
+      if (!result.destination) {
+        return;
+      }
+      dispatch({
+        type: "MOVE",
+        from: result.source.droppableId,
+        to: result.destination.droppableId,
+        fromIndex: result.source.index,
+        toIndex: result.destination.index,
+      });
+    }
+  }, [dispatch]);
+
+  const getCardIcon = useCallback((type) => type === "project"
+    ? projectIcon
+    : type === "service"
+      ? serviceIcon
+      : type === "job"
+        ? jobIcon
+        : programmeIcon, []);
+
   return (
     <MainLayout match={match}>
       <div className={styles.container}>
-        <div style={{ width: "100%" }}>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div style={{ width: "100%" }}>
           <StyledTabs
             value={activeTab}
             onChange={handleTabChange}
@@ -522,40 +639,104 @@ export default function BountiesView({ match }) {
                 </div>
               </div>
             </div>
-            <div style={{ marginTop: 16 }}>
-              {loading ? (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginTop: 32,
-                  }}
-                >
-                  <CircularProgress style={{ color: "white" }} />
-                </div>
-              ) : search && filteredBounties.length === 0 ? (
-                <div
-                  style={{
-                    color: "white",
-                    fontSize: 12,
-                    textAlign: "center",
-                    marginTop: 32,
-                  }}
-                >
-                  No bounties found
-                </div>
-              ) : (
-                activeTab === 0
-                  ? myBounties.map((bounty, index) => (
-                    <BountyCard bounty={bounty} search={search} key={`bounty-card-${index}`} />
-                  ))
-                  : filteredBounties.map((bounty, index) => (
-                    <BountyCard bounty={bounty} search={search} key={`bounty-card-${index}`} />
-                  ))
-              )}
+            <div className={styles.cardWrapper}>
+              {
+                [...bountyTypes, "completed"].map((type) => (
+                  <Droppable type="PERSON" droppableId={type} key={`droppable-${type}`}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={clsx(styles.dropper, {
+                          [styles.dropOver]: snapshot.isDraggingOver,
+                        })}
+                      >
+                        <div className={styles.cardTitle}>
+                          {
+                            bountyTypes.includes(type) &&
+                            <div
+                              className={styles.cardIcon}
+                              style={{
+                                backgroundColor:
+                                  type === "project"
+                                    ? "#EF8144"
+                                    : type === "service"
+                                    ? "#4452EF"
+                                    : type === "job"
+                                      ? "#00B6F0"
+                                      : "#AD1D73",
+                              }}
+                            >
+                              <img
+                                src={getCardIcon(type)}
+                                style={{ width: 12 }}
+                                alt="icon"
+                              />
+                            </div>
+                          }
+                          <span>{type}</span>
+                        </div>
+                        {cardState[type]?.map((bounty, index) => (
+                          <Draggable
+                            key={`draggable-${type}-${index}`}
+                            draggableId={bounty._id}
+                            index={index}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                className={clsx(styles.dragger, {
+                                  [styles.dragging]: snapshot.isDragging,
+                                })}
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <div className={styles.draggerContent}>
+                                  {bounty.title}
+                                </div>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                      </div>
+                    )}
+                  </Droppable>
+                ))
+              }
+              {/*{loading ? (*/}
+              {/*  <div*/}
+              {/*    style={{*/}
+              {/*      display: "flex",*/}
+              {/*      justifyContent: "center",*/}
+              {/*      marginTop: 32,*/}
+              {/*    }}*/}
+              {/*  >*/}
+              {/*    <CircularProgress style={{ color: "white" }} />*/}
+              {/*  </div>*/}
+              {/*) : search && filteredBounties.length === 0 ? (*/}
+              {/*  <div*/}
+              {/*    style={{*/}
+              {/*      color: "white",*/}
+              {/*      fontSize: 12,*/}
+              {/*      textAlign: "center",*/}
+              {/*      marginTop: 32,*/}
+              {/*    }}*/}
+              {/*  >*/}
+              {/*    No bounties found*/}
+              {/*  </div>*/}
+              {/*) : (*/}
+              {/*  activeTab === 0*/}
+              {/*    ? myBounties.map((bounty, index) => (*/}
+              {/*      <BountyCard bounty={bounty} search={search} key={`bounty-card-${index}`} />*/}
+              {/*    ))*/}
+              {/*    : filteredBounties.map((bounty, index) => (*/}
+              {/*      <BountyCard bounty={bounty} search={search} key={`bounty-card-${index}`} />*/}
+              {/*    ))*/}
+              {/*)}*/}
             </div>
           </div>
         </div>
+        </DragDropContext>
       </div>
     </MainLayout>
   )
