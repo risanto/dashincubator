@@ -24,8 +24,8 @@ export const getBountyActivity = async (id) =>
 export const updateBounty = (data) =>
   dashincubatorRequest(`bounties/update`, RequestTypes.Put, data);
 
-export const getBounty = async (id) =>
-  dashincubatorRequest(`bounties/bounty/${id}`, RequestTypes.Get);
+export const getBounty = async (displayURL) =>
+  dashincubatorRequest(`bounties/bounty/${displayURL}`, RequestTypes.Get);
 
 export const commentBounty = (data, bountyId) =>
   dashincubatorRequest(`bounties/comment/${bountyId}`, RequestTypes.Put, data);
@@ -36,5 +36,3 @@ export const updateCommentBounty = (data, commentId) =>
     RequestTypes.Put,
     data
   );
-
-export const updateCommentLastSeen = (id) => dashincubatorRequest(`bounties/comment/${id}/last-seen`, RequestTypes.Put);

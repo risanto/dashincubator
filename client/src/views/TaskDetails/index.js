@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router";
 import { createUseStyles } from "react-jss";
+import useGlobalState from "../../state";
+
 import {
   commentTask,
   getTaskActivity,
+  updateTaskActivityView,
   requestToReserveTask,
 } from "../../api/tasksApi";
+import { getBounty } from "../../api/bountiesApi";
+
 import { CircularProgress } from "@material-ui/core";
 import DashModal from "../../components/DashModal";
 import UserAvatar from "../../components/UserAvatar";
-import useGlobalState from "../../state";
+import ActivityItem from "../../components/ActivityItem";
+import Textarea from "../../components/Textarea";
+
+import { ProfileLocation, BountyLocation } from "../../Locations";
+import { Breakpoints } from "../../utils/utils";
+
 import dashLogo from "./images/dashWhite.svg";
 import doneIcon from "../Concept/images/done.svg";
-import ActivityItem from "../../components/ActivityItem";
-import { ProfileLocation } from "../../Locations";
-import { useHistory } from "react-router";
-import Textarea from "../../components/Textarea";
 import moment from "moment";
-import { Breakpoints } from "../../utils/utils";
 
 const useStyles = createUseStyles({
   assignment: {
@@ -105,6 +111,16 @@ const useStyles = createUseStyles({
       wordBreak: "normal",
     },
   },
+  bountyLink: {
+    fontSize: "11px",
+    textDecoration: "underline",
+    fontWeight: 500,
+    cursor: "pointer",
+    marginLeft: "24px",
+    "&:hover": {
+      color: "aliceblue",
+    },
+  },
 });
 
 export default function TaskDetailsView({
@@ -129,6 +145,7 @@ export default function TaskDetailsView({
       ) !== undefined
   );
   const [activity, setActivity] = useState(null);
+  const [bountyData, setBountyData] = useState(bounty ?? null);
   const styles = useStyles();
   const history = useHistory();
 
@@ -145,7 +162,18 @@ export default function TaskDetailsView({
   useEffect(() => {
     getTaskActivity(task._id)
       .then((data) => data.json())
-      .then((results) => setActivity(results));
+      .then((results) => {
+        setActivity(results);
+        updateTaskActivityView(task._id);
+
+        if (!bountyData) {
+          getBounty(task.bountyDisplayURL)
+            .then((data) => data.json())
+            .then((results) => {
+              setBountyData(results);
+            });
+        }
+      });
     //eslint-disable-next-line
   }, [open]);
 
@@ -215,7 +243,8 @@ export default function TaskDetailsView({
                     Edit task
                   </div>
                 )}
-              {bounty.bountyType === "job" &&
+              {bountyData?.bountyType === "job" &&
+              task.assignee?.username === loggedInUser?.username &&
               loggedInUser?.username !== task.createdBy.username ? (
                 <div
                   className={styles.CTA}
@@ -370,62 +399,77 @@ export default function TaskDetailsView({
           <div
             style={{
               display: "flex",
+              justifyContent: "space-between",
               alignItems: "center",
               marginTop: "32px",
             }}
           >
-            <img src={dashLogo} alt="dash" />
-            <div
-              style={{
-                marginLeft: "10px",
-                fontWeight: 600,
-                fontSize: "12px",
-                lineHeight: "15px",
-              }}
-            >
-              {task.payout} DASH
-            </div>
-            <div style={{ marginLeft: "10px" }}>
-              {task.assignee ? (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <div className={styles.assignment}>
-                    {task.status === "complete"
-                      ? "Completed by"
-                      : "Assigned to"}
-                  </div>
+            <div style={{ display: "flex" }}>
+              <img src={dashLogo} alt="dash" />
+              <div
+                style={{
+                  marginLeft: "10px",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  lineHeight: "15px",
+                }}
+              >
+                {task.payout} DASH
+              </div>
+              <div style={{ marginLeft: "10px" }}>
+                {task.assignee ? (
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      cursor: "pointer",
                     }}
-                    onClick={() =>
-                      history.push(ProfileLocation(task.assignee.usernname))
-                    }
                   >
-                    <UserAvatar
-                      size={18}
-                      fontSize={"8px"}
-                      lineHeight={"10px"}
-                      user={task.assignee}
-                    />
-                    <div className={styles.assignee}>
-                      {task.assignee.username}
+                    <div className={styles.assignment}>
+                      {task.status === "complete"
+                        ? "Completed by"
+                        : "Assigned to"}
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        history.push(ProfileLocation(task.assignee.usernname))
+                      }
+                    >
+                      <UserAvatar
+                        size={18}
+                        fontSize={"8px"}
+                        lineHeight={"10px"}
+                        user={task.assignee}
+                      />
+                      <div className={styles.assignee}>
+                        {task.assignee.username}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div
-                  style={{ opacity: 0.5, fontSize: "12px", lineHeight: "15px" }}
-                >
-                  Unassigned
-                </div>
-              )}
+                ) : (
+                  <div
+                    style={{
+                      opacity: 0.5,
+                      fontSize: "12px",
+                      lineHeight: "15px",
+                    }}
+                  >
+                    Unassigned
+                  </div>
+                )}
+              </div>
+            </div>
+            <div
+              className={styles.bountyLink}
+              onClick={() =>
+                history.push(BountyLocation(task.bountyDisplayURL))
+              }
+            >
+              {task.bountyTitle}
             </div>
           </div>
         </div>

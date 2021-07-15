@@ -130,7 +130,7 @@ const useMUIStyles = makeStyles({
   },
 });
 
-export default function TaskView({ open, onClose, concept, task }) {
+export default function EditTaskView({ open, onClose, concept, task }) {
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState(task ? task.description : "");
   const [type, setType] = useState(task ? task.taskType : "spec");

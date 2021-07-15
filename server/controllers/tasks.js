@@ -34,6 +34,38 @@ router.get(
 );
 
 router.get(
+  "/open",
+  ...authHandlers(async (req, res) => {
+    const result = await tasksCollection
+      .aggregate([
+        {
+          $match: {
+            status: "open",
+          },
+        },
+        {
+          $lookup: {
+            from: "activity",
+            let: { taskID: "$_id" },
+            pipeline: [
+              { $match: { $expr: { $eq: ["$taskID", "$$taskID"] } } },
+              { $sort: { date: -1 } },
+            ],
+            as: "comments",
+          },
+        },
+        {
+          $sort: {
+            dateCreated: -1,
+          },
+        },
+      ])
+      .toArray();
+    res.send(result);
+  })
+);
+
+router.get(
   "/completed",
   ...authHandlers(async (req, res) => {
     let jobItems = [];
@@ -766,5 +798,20 @@ router.put(
     res.send({ message: "success" });
   })
 );
+
+router.put(
+  "/activity-viewed/:id",
+  ...authHandlers(async (req, res) => {
+    // add username with time of view
+    const newKey = `lastView.${req.tokenPayload.username}`;
+
+    await activityCollection.updateMany(
+      { taskID: ObjectID(req.params.id), activityLevel: "task" },
+      { $set: { [newKey]: new Date() } }
+    );
+    res.send({ message: "success" });
+  })
+);
+
 
 module.exports = router;

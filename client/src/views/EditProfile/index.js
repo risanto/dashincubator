@@ -81,7 +81,6 @@ export default function EditProfileView({ open, onClose }) {
       setAuthToken(data.token);
     }
     if (data.user) {
-      console.log(data.user);
       setLoggedInUser(data.user);
     }
     setLoading(false);

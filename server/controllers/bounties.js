@@ -185,22 +185,32 @@ router.get(
             localField: "_id",
             foreignField: "bountyID",
             as: "comments",
-          }
+          },
         },
         {
-          $project : { user: 1, title: 1, displayURL: 1, dateCreated: 1, status: 1, valueProposition: 1, comments: 1 }
-        }
+          $project: {
+            user: 1,
+            title: 1,
+            displayURL: 1,
+            dateCreated: 1,
+            status: 1,
+            valueProposition: 1,
+            comments: 1,
+          },
+        },
       ])
       .toArray((err, bounties) => {
         res.send(
-          bounties.sort(
-            (a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)
-          ).map((bounty) => ({
-            ...bounty,
-            comments: bounty.comments
-              .filter(comment => ["task", "bounty"].includes(comment.activityLevel) && comment.activityType === "commentBounty")
-              .sort((a, b) => new Date(b.date) - new Date(a.date))
-          }))
+          bounties
+            .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
+            .map((bounty) => ({
+              ...bounty,
+              comments: bounty.comments.filter(
+                (comment) =>
+                  ["task", "bounty"].includes(comment.activityLevel) &&
+                  comment.activityType === "commentBounty"
+              ),
+            }))
         );
       });
   })
