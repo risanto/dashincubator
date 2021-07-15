@@ -257,7 +257,8 @@ export default function BountiesView({ match }) {
     return filteredBounties.filter((bounty) => {
       return (bounty.primaryAdmin && bounty.primaryAdmin.username === loggedInUser.username) ||
         (bounty.secondaryAdmin && bounty.secondaryAdmin.username === loggedInUser.username) ||
-        (bounty.user && bounty.user.username === loggedInUser.username);
+        (bounty.user && bounty.user.username === loggedInUser.username) ||
+        (bounty.tasks.findIndex((task) => task.assignee && task.assignee.username === loggedInUser.username) >= 0);
     });
   }, [filteredBounties, loggedInUser]);
 

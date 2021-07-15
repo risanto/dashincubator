@@ -30,6 +30,14 @@ router.get(
           foreignField: "bountyID",
           as: "comments"
         }
+      },
+      {
+        $lookup: {
+          from: "tasks",
+          localField: "_id",
+          foreignField: "bountyID",
+          as: "tasks"
+        }
       }
     ])
       .toArray((err, bounties) => {
