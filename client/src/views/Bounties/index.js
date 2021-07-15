@@ -11,7 +11,7 @@ import Tab from "@material-ui/core/Tab";
 
 import useOutsideAlerter, {bountyStatus, bountyTypes, Breakpoints} from "../../utils/utils";
 import BountyCard from "../../components/BountyCard";
-import {fetchBounties} from "../../api/bountiesApi";
+import {fetchBounties, updateBounty} from "../../api/bountiesApi";
 
 import searchIcon from "../Home/images/search.svg";
 import checked from "../Home/images/checked.svg";
@@ -25,6 +25,7 @@ import projectIcon from "../ApproveConcept/images/project.svg";
 import serviceIcon from "../ApproveConcept/images/service.svg";
 import jobIcon from "../ApproveConcept/images/job.svg";
 import programmeIcon from "../ApproveConcept/images/programme.svg";
+import UserAvatar from "../../components/UserAvatar";
 
 const useStyles = createUseStyles({
   container: {
@@ -96,6 +97,7 @@ const useStyles = createUseStyles({
     fontSize: 12,
     color: "white",
     zIndex: 11,
+    width: 106,
   },
   filterItemWrapper: {
     marginTop: 8,
@@ -171,7 +173,6 @@ const useStyles = createUseStyles({
     backgroundColor: "#F4F5F7",
   },
   dragger: {
-    padding: 16,
     margin: "8px 0",
     backgroundColor: "#fff",
     borderRadius: 4,
@@ -185,11 +186,12 @@ const useStyles = createUseStyles({
   },
   draggerContent: {
     display: "flex",
-    alignItems: "center",
+    flexDirection: "column",
   },
   cardWrapper: {
     display: "flex",
     alignItems: "flex-start",
+    justifyContent: "center",
     marginTop: 16,
   },
   cardTitle: {
@@ -249,13 +251,20 @@ const dragReducer = produce((draft, action) => {
       draft[action.to] = draft[action.to] || [];
       const [removed] = draft[action.from].splice(action.fromIndex, 1);
       draft[action.to].splice(action.toIndex, 0, removed);
+      updateBounty({
+        _id: removed._id,
+        bountyType: action.to,
+      })
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
       break;
     }
     case "SET_ITEMS": {
-      draft.project = action.payload.filter(el => el.bountyType === "project");
-      draft.job = action.payload.filter(el => el.bountyType === "job");
-      draft.service = action.payload.filter(el => el.bountyType === "service");
-      draft.programme = action.payload.filter(el => el.bountyType === "programme");
+      draft.project = action.payload.filter(el => el.bountyType === "project" && el.status !== "completed");
+      draft.job = action.payload.filter(el => el.bountyType === "job" && el.status !== "completed");
+      draft.service = action.payload.filter(el => el.bountyType === "service" && el.status !== "completed");
+      draft.programme = action.payload.filter(el => el.bountyType === "programme" && el.status !== "completed");
+      draft.completed = action.payload.filter(el => el.status === "completed");
       break;
     }
   }
@@ -263,7 +272,7 @@ const dragReducer = produce((draft, action) => {
 
 export default function BountiesView({ match }) {
   const styles = useStyles();
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1);
   const [search, setSearch] = useState("");
   const [searchStatus, setSearchStatus] = useState(bountyStatus);
   const [searchingStatus, setSearchingStatus] = useState(false);
@@ -405,7 +414,18 @@ export default function BountiesView({ match }) {
 
   const handleTabChange = useCallback((event, newTab) => {
     setActiveTab(newTab);
-  }, []);
+    if (newTab === 0) {
+      dispatch({
+        type: "SET_ITEMS",
+        payload: myBounties,
+      });
+    } else {
+      dispatch({
+        type: "SET_ITEMS",
+        payload: filteredBounties,
+      });
+    }
+  }, [activeTab, myBounties, filteredBounties]);
 
   const handleSearchChange = useCallback((e) => {
     setSearch(e.target.value);
@@ -480,13 +500,7 @@ export default function BountiesView({ match }) {
                   onClick={() => setSearchingTypes(true)}
                 >
                   {searchingTypes && (
-                    <div
-                      style={{
-                        width: "106px",
-                      }}
-                      className={styles.filterItemsContainer}
-                      ref={typeRef}
-                    >
+                    <div className={styles.filterItemsContainer} ref={typeRef}>
                       {bountyTypes.map((tag, i) => (
                         <div
                           className={styles.filterItemWrapper}
@@ -536,13 +550,7 @@ export default function BountiesView({ match }) {
                 </div>
                 <div style={{ position: "relative", marginLeft: "20px" }}>
                   {searchingStatus && (
-                    <div
-                      style={{
-                        width: "100px",
-                      }}
-                      className={styles.filterItemsContainer}
-                      ref={catRef}
-                    >
+                    <div className={styles.filterItemsContainer} ref={catRef}>
                       {bountyStatus.map((tag, i) => (
                         <div
                           className={styles.filterItemWrapper}
@@ -640,7 +648,28 @@ export default function BountiesView({ match }) {
               </div>
             </div>
             <div className={styles.cardWrapper}>
-              {
+              {loading ? (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: 32,
+                  }}
+                >
+                  <CircularProgress style={{ color: "white" }} />
+                </div>
+              ) : search && filteredBounties.length === 0 ? (
+                <div
+                  style={{
+                    color: "white",
+                    fontSize: 12,
+                    textAlign: "center",
+                    marginTop: 32,
+                  }}
+                >
+                  No bounties found
+                </div>
+              ) : (
                 [...bountyTypes, "completed"].map((type) => (
                   <Droppable type="PERSON" droppableId={type} key={`droppable-${type}`}>
                     {(provided, snapshot) => (
@@ -691,9 +720,7 @@ export default function BountiesView({ match }) {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                               >
-                                <div className={styles.draggerContent}>
-                                  {bounty.title}
-                                </div>
+                                <BountyCard bounty={bounty} search={search} />
                               </div>
                             )}
                           </Draggable>
@@ -702,29 +729,7 @@ export default function BountiesView({ match }) {
                     )}
                   </Droppable>
                 ))
-              }
-              {/*{loading ? (*/}
-              {/*  <div*/}
-              {/*    style={{*/}
-              {/*      display: "flex",*/}
-              {/*      justifyContent: "center",*/}
-              {/*      marginTop: 32,*/}
-              {/*    }}*/}
-              {/*  >*/}
-              {/*    <CircularProgress style={{ color: "white" }} />*/}
-              {/*  </div>*/}
-              {/*) : search && filteredBounties.length === 0 ? (*/}
-              {/*  <div*/}
-              {/*    style={{*/}
-              {/*      color: "white",*/}
-              {/*      fontSize: 12,*/}
-              {/*      textAlign: "center",*/}
-              {/*      marginTop: 32,*/}
-              {/*    }}*/}
-              {/*  >*/}
-              {/*    No bounties found*/}
-              {/*  </div>*/}
-              {/*) : (*/}
+              )}
               {/*  activeTab === 0*/}
               {/*    ? myBounties.map((bounty, index) => (*/}
               {/*      <BountyCard bounty={bounty} search={search} key={`bounty-card-${index}`} />*/}

@@ -237,7 +237,7 @@ router.put(
   "/update",
   ...authHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
-      res.send({ error: "Insufficient permissions" });
+      res.status(403).send({ error: "Insufficient permissions" });
     } else {
       const newData = { ...req.body };
       delete newData._id;
