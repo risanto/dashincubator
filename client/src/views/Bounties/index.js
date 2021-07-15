@@ -25,7 +25,6 @@ import projectIcon from "../ApproveConcept/images/project.svg";
 import serviceIcon from "../ApproveConcept/images/service.svg";
 import jobIcon from "../ApproveConcept/images/job.svg";
 import programmeIcon from "../ApproveConcept/images/programme.svg";
-import UserAvatar from "../../components/UserAvatar";
 
 const useStyles = createUseStyles({
   container: {
@@ -267,6 +266,8 @@ const dragReducer = produce((draft, action) => {
       draft.completed = action.payload.filter(el => el.status === "completed");
       break;
     }
+    default:
+      break;
   }
 });
 
@@ -425,7 +426,7 @@ export default function BountiesView({ match }) {
         payload: filteredBounties,
       });
     }
-  }, [activeTab, myBounties, filteredBounties]);
+  }, [myBounties, filteredBounties]);
 
   const handleSearchChange = useCallback((e) => {
     setSearch(e.target.value);

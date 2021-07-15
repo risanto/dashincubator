@@ -1,7 +1,7 @@
 import React, {useMemo} from "react";
 import moment from "moment";
 import UserAvatar from "./UserAvatar";
-import {longhandRelative, truncate, Breakpoints, getHighlightedText} from "../utils/utils";
+import {longhandRelative, Breakpoints, getHighlightedText} from "../utils/utils";
 import { useHistory } from "react-router";
 import { BountyLocation } from "../Locations";
 import { createUseStyles } from "react-jss";
