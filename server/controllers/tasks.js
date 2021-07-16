@@ -160,7 +160,7 @@ router.get(
       result = { ...result, claimsToProcess, bidsToProcess, managing };
     }
 
-    if (eq.tokenPayload.isSuperUser) {
+    if (req.tokenPayload.isSuperUser) {
       result = { ...result, tasksToPay };
     }
 

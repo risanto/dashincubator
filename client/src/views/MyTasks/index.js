@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { createUseStyles } from "react-jss";
+
 import MainLayout from "../../layouts/MainLayout";
 import Lottie from "react-lottie";
 import * as animationData from "./done.json";
-import { fetchDashboard, fetchNotifications } from "../../api/global";
+
+import { fetchMyTasks } from "../../api/tasksApi";
+
+import TaskDetailsView from "../TaskDetails";
+import ReviewTaskView from "../ReviewTask";
+import CompleteTaskView from "../CompleteTask";
+import CompleteJobView from "../CompleteJob";
+import EditTaskView from "../EditTask";
+import ReviewJobView from "../ReviewJob";
+
 import NotificationItem from "../../components/NotificationItem";
 import checkedIcon from "../Home/images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
-import { readAllNotifications } from "../../api/notificationsApi";
 import caretDown from "../Home/images/caretDown.svg";
 import { truncate, Breakpoints } from "../../utils/utils";
 import { useHistory } from "react-router";
@@ -69,19 +78,18 @@ const useStyles = createUseStyles({
     lineHeight: "15px",
     marginTop: "32px",
   },
-  dashboardItemContainer: {
+  myTasksItemContainer: {
     fontSize: "18px",
     fontWeight: 600,
     marginTop: "32px",
   },
-  dashboardItemHeader: {
+  myTasksItemHeader: {
     display: "flex",
     alignItems: "center",
     cursor: "pointer",
     userSelect: "none",
   },
   index: {
-    backgroundColor: "#E8E8E8",
     width: "18px",
     height: "18px",
     display: "flex",
@@ -127,10 +135,28 @@ const useStyles = createUseStyles({
 });
 
 export default function MyTasksView({ match }) {
-  const [notifications, setNotifications] = useState(null);
-  const [dashboardItems, setDashboardItems] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [myTasksLoading, setMyTasksLoading] = useState(false);
+  const [myTasksItems, setMyTasksItems] = useState(null);
+
+  const [showWorkingOnTasks, setShowWorkingOnTasks] = useState(true);
+  const [showPendingClaimsTasks, setShowPendingClaimsTasks] = useState(true);
+  const [showPendingBidsTasks, setShowPendingBidsTasks] = useState(true);
+  const [showClaimsToProcessTasks, setShowClaimsToProcessTasks] = useState(true);
+  const [showBidsToProcessTasks, setShowBidsToProcessTasks] = useState(true);
+  const [showManagingTasks, setShowManagingTasks] = useState(true);
+  const [showTasksToPay, setShowTasksToPay] = useState(true);
+
+  const [task, setTask] = useState(null);
+  const [completionID, setCompletionID] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showCompleteJobModal, setShowCompleteJobModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showJobReviewModal, setShowJobReviewModal] = useState(false);
+
+  const [notifications, setNotifications] = useState(null);
   const [showPendingConcepts, setShowPendingConcepts] = useState(false);
   const [showPendingContributorModify, setShowPendingContributorModify] =
     useState(false);
@@ -140,483 +166,299 @@ export default function MyTasksView({ match }) {
   ] = useState(false);
   const [showPendingAdminApproval, setShowPendingAdminApproval] =
     useState(false);
-  const [showUnpaidTasks, setShowUnpaidTasks] = useState(false);
+
   const history = useHistory();
 
   const styles = useStyles();
 
-  const setAllRead = async () => {
-    setLoading(true);
-    await readAllNotifications();
-    fetchNotifications()
-      .then((data) => data.json())
-      .then((result) => {
-        setNotifications(result);
-        setLoading(false);
-      });
-  };
+  function isAllEmpty() {
+    return (
+      Object.keys(myTasksItems).every(function (key) {
+        return myTasksItems[key].length === 0;
+      }) === true
+    );
+  }
 
   useEffect(() => {
-    setDashboardLoading(true);
-    fetchDashboard()
-      .then((data) => data.json())
-      .then((result) => {
-        setDashboardItems(result);
-        setDashboardLoading(false);
-      });
-    fetchNotifications()
-      .then((data) => data.json())
-      .then((result) => setNotifications(result));
+    async function fetchData() {
+      try {
+        setMyTasksLoading(true);
+        const myTasks = await fetchMyTasks();
+
+        setMyTasksItems(myTasks);
+        setMyTasksLoading(false);
+        console.log(myTasks);
+      } catch (error) {
+        console.log("Error in My Tasks ===>", error);
+      }
+    }
+    fetchData();
   }, []);
 
-  return (
-    <MainLayout match={match}>
-      <div className={styles.container}>
-        <div style={{ width: "100%" }}>
-          <div className={styles.header}>MY TASKS</div>
-          <div style={{ marginTop: "32px", color: "white", fontSize: "18px" }}>
-            {dashboardLoading || !dashboardItems ? (
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <CircularProgress style={{ color: "white" }} />
-              </div>
-            ) : (dashboardItems.unpaidTasks?.length === 0 ||
-                !dashboardItems.unpaidTasks) &&
-              (dashboardItems.pendingAdminApproval?.length === 0 ||
-                !dashboardItems.pendingAdminApproval) &&
-              (dashboardItems.pendingConcepts?.length === 0 ||
-                !dashboardItems.pendingConcepts) &&
-              dashboardItems.pendingContributorCompletion.length === 0 &&
-              dashboardItems.pendingContributorModify.length === 0 ? (
+  function renderDropdown({
+    setShowTaskItems,
+    showTaskItems,
+    taskItems,
+    headline,
+  }) {
+    return (
+      <div className={styles.myTasksItemContainer}>
+        <div
+          className={styles.myTasksItemHeader}
+          onClick={() => setShowTaskItems(!showTaskItems)}
+        >
+          <div>{headline}</div>
+          <img
+            src={caretDown}
+            alt="dropdown"
+            style={{
+              marginLeft: "6px",
+              transition: "all 0.2s",
+              transform: showTaskItems ? "rotate(-180deg)" : "rotate(0deg)",
+            }}
+          />
+        </div>
+        {showTaskItems && (
+          <div>
+            {taskItems.map((item, i) => (
               <div
                 style={{
+                  marginTop: "24px",
+                  color: "white",
+                  fontSize: "12px",
+                  fontWeight: "normal",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  setTask(item);
+                  setShowDetailsModal(true);
                 }}
               >
-                <div>
-                  <Lottie
-                    options={defaultOptions}
-                    height={50}
-                    width={50}
-                    isClickToPauseDisabled={true}
-                  />
-                  <div style={{ marginTop: "4px" }}>You're all caught up </div>
+                <div className={styles.index}>{i + 1}</div>
+                <div
+                  style={{ textDecoration: "underline" }}
+                  dangerouslySetInnerHTML={{
+                    __html: item.description,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {showDetailsModal && (
+        <TaskDetailsView
+          task={task}
+          open={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+          onReview={() => {
+            setShowDetailsModal(false);
+            setShowReviewModal(true);
+          }}
+          onComplete={() => {
+            setShowDetailsModal(false);
+            setShowCompleteModal(true);
+          }}
+          onJobComplete={() => {
+            setShowDetailsModal(false);
+            setShowCompleteJobModal(true);
+          }}
+          onEdit={() => {
+            setShowDetailsModal(false);
+            setShowEditModal(true);
+          }}
+          onJobReview={(e, item) => {
+            setCompletionID(item);
+            setShowDetailsModal(false);
+            setShowJobReviewModal(true);
+          }}
+        />
+      )}
+      {showReviewModal && (
+        <ReviewTaskView
+          task={task}
+          open={showReviewModal}
+          onClose={(e, data) => {
+            setShowReviewModal(false);
+            if (data) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      {showCompleteModal && (
+        <CompleteTaskView
+          task={task}
+          open={showCompleteModal}
+          onClose={(e, data) => {
+            setShowCompleteModal(false);
+            if (data) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      {showCompleteJobModal && (
+        <CompleteJobView
+          task={task}
+          open={showCompleteJobModal}
+          onClose={(e, data) => {
+            setShowCompleteJobModal(false);
+            if (data) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      {showEditModal && (
+        <EditTaskView
+          task={task}
+          open={showEditModal}
+          onClose={(e, submit, data) => {
+            setShowEditModal(false);
+            if (submit) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      {showJobReviewModal && (
+        <ReviewJobView
+          task={task}
+          completionID={completionID}
+          open={showJobReviewModal}
+          onClose={(e, data) => {
+            setShowJobReviewModal(false);
+            if (data) {
+              setTask(data);
+            }
+          }}
+        />
+      )}
+      <MainLayout match={match}>
+        <div className={styles.container}>
+          <div style={{ width: "100%" }}>
+            <div className={styles.header}>MY TASKS</div>
+            <div
+              style={{ marginTop: "32px", color: "white", fontSize: "18px" }}
+            >
+              {myTasksLoading || !myTasksItems ? (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <CircularProgress style={{ color: "white" }} />
                 </div>
-              </div>
-            ) : (
-              <div>
-                {dashboardItems.unpaidTasks?.length > 0 && (
-                  <div className={styles.dashboardItemContainer}>
-                    <div
-                      className={styles.dashboardItemHeader}
-                      onClick={() => setShowUnpaidTasks(!showUnpaidTasks)}
-                    >
-                      <div>
-                        ⚠️ You have{" "}
-                        <span
-                          className={styles.notifBadge}
-                          style={{ margin: "0px 2px" }}
-                        >
-                          {dashboardItems.unpaidTasks.length}
-                        </span>{" "}
-                        unpaid task
-                        {dashboardItems.unpaidTasks.length > 1 && "s"} to payout
-                      </div>
-                      <img
-                        src={caretDown}
-                        alt="dropdown"
-                        style={{
-                          marginLeft: "6px",
-                          transition: "all 0.2s",
-                          transform: showUnpaidTasks
-                            ? "rotate(-180deg)"
-                            : "rotate(0deg)",
-                        }}
-                      />
+              ) : // Show "You're all caught up" if every key in myTaskItems is an empty array
+              isAllEmpty() ? (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div>
+                    <Lottie
+                      options={defaultOptions}
+                      height={50}
+                      width={50}
+                      isClickToPauseDisabled={true}
+                    />
+                    <div style={{ marginTop: "4px" }}>
+                      You're all caught up{" "}
                     </div>
-                    {showUnpaidTasks && (
-                      <div>
-                        {dashboardItems.unpaidTasks.map((item, i) => (
-                          <div
-                            style={{
-                              marginTop: "24px",
-                              color: "#0B0F3B",
-                              fontSize: "12px",
-                              fontWeight: "normal",
-                              display: "flex",
-                              alignItems: "center",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => history.push(PaymentsLocation)}
-                          >
-                            <div className={styles.index}>{i + 1}</div>
-                            <div
-                              style={{ textDecoration: "underline" }}
-                              dangerouslySetInnerHTML={{
-                                __html: truncate(item.description, 60),
-                              }}
-                            />
-                          </div>
-                        ))}
-                      </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  {/* 1. Tasks you’re working on -> Tasks the user has been assigned but not created a Claim for yet */}
+                  {myTasksItems.workingOn?.length > 0 && renderDropdown({
+                    setShowTaskItems: setShowWorkingOnTasks,
+                    showTaskItems: showWorkingOnTasks,
+                    taskItems: myTasksItems.workingOn,
+                    headline: "Tasks You're Working On",
+                  })}
+
+                  {/* 2. Pending Claims -> Claims the user has made (on Tasks they want to claim) */}
+                  {myTasksItems.pendingClaims?.length > 0 && renderDropdown({
+                    setShowTaskItems: setShowPendingClaimsTasks,
+                    showTaskItems: showPendingClaimsTasks,
+                    taskItems: myTasksItems.pendingClaims,
+                    headline: "Pending Claims",
+                  })}
+
+                  {/* 3. Pending Bids -> Bids the user has made (on Tasks they want to reserve) */}
+                  {myTasksItems.pendingBids?.length > 0&& renderDropdown({
+                    setShowTaskItems: setShowPendingBidsTasks,
+                    showTaskItems: showPendingBidsTasks,
+                    taskItems: myTasksItems.pendingBids,
+                    headline: "Pending Bids",
+                  })}
+
+                  {/* 4. Claims to Process -> Claims on Tasks the user is the Admin owner of (on uncompleted Tasks) */}
+                  {myTasksItems.claimsToProcess?.length > 0 && renderDropdown({
+                    setShowTaskItems: setShowClaimsToProcessTasks,
+                    showTaskItems: showClaimsToProcessTasks,
+                    taskItems: myTasksItems.claimsToProcess,
+                    headline: "Claims to Process",
+                  })}
+
+                  {/* 5. Bids to Process -> Bids on Tasks the user is the Admin owner of */}
+                  {myTasksItems.bidsToProcess?.length > 0 && renderDropdown({
+                    setShowTaskItems: setShowBidsToProcessTasks,
+                    showTaskItems: showBidsToProcessTasks,
+                    taskItems: myTasksItems.bidsToProcess,
+                    headline: "Bids to Process",
+                  })}
+
+                  {/* 6. Tasks you’re managing -> Tasks the Admin user owns that are in progress */}
+                  {myTasksItems.managing?.length > 0 && renderDropdown({
+                    setShowTaskItems: setShowManagingTasks,
+                    showTaskItems: showManagingTasks,
+                    taskItems: myTasksItems.managing,
+                    headline: "Tasks You're Managing",
+                  })}
+
+                  {/* 7. Tasks to pay -> Completed Tasks from all users that are unpaid */}
+                  {myTasksItems.tasksToPay?.length > 0 && renderDropdown({
+                    setShowTaskItems: setShowTasksToPay,
+                    showTaskItems: showTasksToPay,
+                    taskItems: myTasksItems.tasksToPay,
+                    headline: "Tasks You're Managing",
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className={styles.rightColumn}>
+            {notifications?.length > 0 && (
+              <>
+                <div className={cx(styles.header, styles.mobileHeading)}>
+                  <div>
+                    NOTIFICATIONS{" "}
+                    {notifications.filter((notif) => !notif.isRead).length >
+                      0 && (
+                      <span className={styles.notifBadge}>
+                        {notifications.filter((notif) => !notif.isRead).length}
+                      </span>
                     )}
                   </div>
-                )}
-                {dashboardItems.pendingAdminApproval?.length > 0 && (
-                  <div className={styles.dashboardItemContainer}>
-                    <div
-                      className={styles.dashboardItemHeader}
-                      onClick={() =>
-                        setShowPendingAdminApproval(!showPendingAdminApproval)
-                      }
-                    >
-                      <div>
-                        ⚠️ You have{" "}
-                        <span
-                          className={styles.notifBadge}
-                          style={{ margin: "0px 2px" }}
-                        >
-                          {dashboardItems.pendingAdminApproval.length}
-                        </span>{" "}
-                        task completion
-                        {dashboardItems.pendingAdminApproval.length > 1 &&
-                          "s"}{" "}
-                        pending your review
-                      </div>
-                      <img
-                        src={caretDown}
-                        alt="dropdown"
-                        style={{
-                          marginLeft: "6px",
-                          transition: "all 0.2s",
-                          transform: showPendingAdminApproval
-                            ? "rotate(-180deg)"
-                            : "rotate(0deg)",
-                        }}
-                      />
-                    </div>
-                    {showPendingAdminApproval && (
-                      <div>
-                        {dashboardItems.pendingAdminApproval.map((item, i) => (
-                          <div
-                            style={{
-                              marginTop: "24px",
-                              color: "#0B0F3B",
-                              fontSize: "12px",
-                              fontWeight: "normal",
-                              display: "flex",
-                              cursor: "pointer",
-                            }}
-                            onClick={() =>
-                              history.push(
-                                BountyLocation(item.bountyDisplayURL)
-                              )
-                            }
-                          >
-                            <div className={styles.index}>{i + 1}</div>
-                            <div>
-                              <div>
-                                <b>
-                                  {item.bountyType === "job"
-                                    ? item.completionUser.username
-                                    : item.completions[
-                                        item.completions.length - 1
-                                      ].completionUser.username}
-                                </b>
-                              </div>
-                              <div
-                                className={styles.quote}
-                                dangerouslySetInnerHTML={{
-                                  __html: truncate(
-                                    item.bountyType === "job"
-                                      ? item.completionDescription
-                                      : item.completions[
-                                          item.completions.length - 1
-                                        ].completionDescription,
-                                    60
-                                  ),
-                                }}
-                              />
-                              <div style={{ marginTop: "4px" }}>
-                                Bounty: <u>{item.bountyTitle}</u>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {dashboardItems.pendingContributorCompletion?.length > 0 && (
-                  <div className={styles.dashboardItemContainer}>
-                    <div
-                      className={styles.dashboardItemHeader}
-                      onClick={() =>
-                        setShowPendingContributorCompletion(
-                          !showPendingContributorCompletion
-                        )
-                      }
-                    >
-                      <div>
-                        ⚠️ You have{" "}
-                        <span
-                          className={styles.notifBadge}
-                          style={{ margin: "0px 2px" }}
-                        >
-                          {dashboardItems.pendingContributorCompletion.length}
-                        </span>{" "}
-                        task
-                        {dashboardItems.pendingContributorCompletion.length >
-                          1 && "s"}{" "}
-                        awaiting your completion
-                      </div>
-                      <img
-                        src={caretDown}
-                        alt="dropdown"
-                        style={{
-                          marginLeft: "6px",
-                          transition: "all 0.2s",
-                          transform: showPendingContributorCompletion
-                            ? "rotate(-180deg)"
-                            : "rotate(0deg)",
-                        }}
-                      />
-                    </div>
-                    {showPendingContributorCompletion && (
-                      <div>
-                        {dashboardItems.pendingContributorCompletion.map(
-                          (item, i) => (
-                            <div
-                              style={{
-                                marginTop: "24px",
-                                color: "#0B0F3B",
-                                fontSize: "12px",
-                                fontWeight: "normal",
-                                display: "flex",
-                                alignItems: "center",
-                                cursor: "pointer",
-                              }}
-                              onClick={() =>
-                                history.push(
-                                  BountyLocation(item.bountyDisplayURL)
-                                )
-                              }
-                            >
-                              <div className={styles.index}>{i + 1}</div>
-                              <div
-                                style={{ textDecoration: "underline" }}
-                                dangerouslySetInnerHTML={{
-                                  __html: truncate(item.description, 60),
-                                }}
-                              />
-                            </div>
-                          )
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {dashboardItems.pendingContributorModify?.length > 0 && (
-                  <div className={styles.dashboardItemContainer}>
-                    <div
-                      className={styles.dashboardItemHeader}
-                      onClick={() =>
-                        setShowPendingContributorModify(
-                          !showPendingContributorModify
-                        )
-                      }
-                    >
-                      <div>
-                        ⚠️ You have{" "}
-                        <span
-                          className={styles.notifBadge}
-                          style={{ margin: "0px 2px" }}
-                        >
-                          {dashboardItems.pendingContributorModify.length}
-                        </span>{" "}
-                        task
-                        {dashboardItems.pendingContributorModify.length > 1 &&
-                          "s"}{" "}
-                        awaiting your modifications
-                      </div>
-                      <img
-                        src={caretDown}
-                        alt="dropdown"
-                        style={{
-                          marginLeft: "6px",
-                          transition: "all 0.2s",
-                          transform: showPendingContributorModify
-                            ? "rotate(-180deg)"
-                            : "rotate(0deg)",
-                        }}
-                      />
-                    </div>
-                    {showPendingContributorModify && (
-                      <div>
-                        {dashboardItems.pendingContributorModify.map(
-                          (item, i) => (
-                            <div
-                              style={{
-                                marginTop: "24px",
-                                color: "#0B0F3B",
-                                fontSize: "12px",
-                                fontWeight: "normal",
-                                display: "flex",
-                                cursor: "pointer",
-                              }}
-                              onClick={() =>
-                                history.push(
-                                  BountyLocation(item.bountyDisplayURL)
-                                )
-                              }
-                            >
-                              <div className={styles.index}>{i + 1}</div>
-                              <div>
-                                <div>
-                                  <b>
-                                    {
-                                      item.reviews[item.reviews.length - 1]
-                                        .reviewUser.username
-                                    }
-                                  </b>
-                                </div>
-                                <div
-                                  className={styles.quote}
-                                  dangerouslySetInnerHTML={{
-                                    __html: truncate(
-                                      item.reviews[item.reviews.length - 1]
-                                        .reviewComments,
-                                      60
-                                    ),
-                                  }}
-                                />
-                                <div style={{ marginTop: "4px" }}>
-                                  Bounty: <u>{item.bountyTitle}</u>
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {dashboardItems.pendingConcepts?.length > 0 && (
-                  <div className={styles.dashboardItemContainer}>
-                    <div
-                      className={styles.dashboardItemHeader}
-                      onClick={() =>
-                        setShowPendingConcepts(!showPendingConcepts)
-                      }
-                    >
-                      <div>
-                        ⚠️ There{" "}
-                        {dashboardItems.pendingConcepts.length > 1
-                          ? "are"
-                          : "is"}{" "}
-                        <span
-                          className={styles.notifBadge}
-                          style={{ margin: "0px 2px" }}
-                        >
-                          {dashboardItems.pendingConcepts.length}
-                        </span>{" "}
-                        concept
-                        {dashboardItems.pendingConcepts.length > 1 && "s"}{" "}
-                        pending approval
-                      </div>
-                      <img
-                        src={caretDown}
-                        alt="dropdown"
-                        style={{
-                          marginLeft: "6px",
-                          transition: "all 0.2s",
-                          transform: showPendingConcepts
-                            ? "rotate(-180deg)"
-                            : "rotate(0deg)",
-                        }}
-                      />
-                    </div>
-                    {showPendingConcepts && (
-                      <div>
-                        {dashboardItems.pendingConcepts.map((item, i) => (
-                          <div
-                            style={{
-                              marginTop: "24px",
-                              color: "#0B0F3B",
-                              fontSize: "12px",
-                              fontWeight: "normal",
-                              display: "flex",
-                              alignItems: "center",
-                              cursor: "pointer",
-                            }}
-                            onClick={() =>
-                              history.push(ConceptLocation(item.displayURL))
-                            }
-                          >
-                            <div className={styles.index}>{i + 1}</div>
-                            <div style={{ textDecoration: "underline" }}>
-                              {item.title}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                </div>
+                <div style={{ marginTop: "32px" }}>
+                  {notifications?.map((notification) => (
+                    <NotificationItem notification={notification} />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
-        <div className={styles.rightColumn}>
-          {notifications?.length > 0 && (
-            <>
-              <div className={cx(styles.header, styles.mobileHeading)}>
-                <div>
-                  NOTIFICATIONS{" "}
-                  {notifications.filter((notif) => !notif.isRead).length >
-                    0 && (
-                    <span className={styles.notifBadge}>
-                      {notifications.filter((notif) => !notif.isRead).length}
-                    </span>
-                  )}
-                </div>
-                {notifications.filter((notif) => !notif.isRead).length > 0 && (
-                  <div
-                    className={cx(styles.header, styles.markAll)}
-                    onClick={() => !loading && setAllRead()}
-                  >
-                    {loading ? (
-                      <div style={{ marginRight: "12px" }}>
-                        <CircularProgress
-                          style={{ color: "white" }}
-                          size={14}
-                        />
-                      </div>
-                    ) : (
-                      <img
-                        src={checkedIcon}
-                        alt="read"
-                        style={{
-                          marginRight: "8px",
-                          width: "14px",
-                          height: "14px",
-                        }}
-                      />
-                    )}
-                    Mark all notifications as read
-                  </div>
-                )}
-              </div>
-              <div style={{ marginTop: "32px" }}>
-                {notifications?.map((notification) => (
-                  <NotificationItem notification={notification} />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </MainLayout>
+      </MainLayout>
+    </>
   );
 }

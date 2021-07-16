@@ -5,6 +5,14 @@ export const fetchOpenTasks = async () => {
   return response.json();
 };
 
+export const fetchMyTasks = async () => {
+  const response = await dashincubatorRequest(
+    `tasks/current`,
+    RequestTypes.Get
+  );
+  return response.json();
+};
+
 export const getTask = async (id) =>
   dashincubatorRequest(`tasks/get/${id}`, RequestTypes.Get);
 
