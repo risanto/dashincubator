@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import {
   ActivityLocation, BountiesLocation,
   ConceptsLocation,
-  DashboardLocation,
+  MyTasksLocation,
   PaymentsLocation,
   ProfileLocation,
   RootLocation,
@@ -17,11 +17,10 @@ import checkboxIcon from "./images/checkbox.svg";
 import { createUseStyles } from "react-jss";
 import { Breakpoints } from "../../utils/utils";
 import timeIcon from "./images/time.svg";
-import notificationIcon from "./images/notification.svg";
 import UserAvatar from "../../components/UserAvatar";
-import { countNotifications } from "../../api/notificationsApi";
-import { fetchDashboardCount } from "../../api/global";
+
 import hamburgerIcon from "./images/hamburger.svg";
+import taskIcon from "./images/task.svg";
 import DashModal from "../../components/DashModal";
 import homeIcon from "./images/home.svg";
 
@@ -109,7 +108,6 @@ export default function MainLayout({ children, style, match }) {
   const { setLoggedInUser, loggedInUser } = useGlobalState();
   const styles = useStyles();
   const history = useHistory();
-  const [notifCount, setNotifCount] = useState(null);
   const [showNav, setShowNav] = useState(false);
 
   const onLogout = () => {
@@ -119,18 +117,6 @@ export default function MainLayout({ children, style, match }) {
   };
 
   useEffect(() => {
-    let count = 0;
-    countNotifications()
-      .then((data) => data.json())
-      .then((result) => {
-        count += result.count;
-        fetchDashboardCount()
-          .then((d) => d.json())
-          .then((items) => {
-            Object.keys(items).map((key) => (count += items[key]));
-            setNotifCount(count);
-          });
-      });
   }, []);
 
   const handleConcept = useCallback(() => {
@@ -160,22 +146,15 @@ export default function MainLayout({ children, style, match }) {
             style={{ marginTop: "24px" }}
             onClick={() => {
               setShowNav(false);
-              history.push(DashboardLocation);
+              history.push(MyTasksLocation);
             }}
           >
             <img
-              src={notificationIcon}
-              alt={"time"}
+              src={taskIcon}
+              alt={"task"}
               style={{ width: "16px" }}
             />
-            <div className={styles.navTitle}>Dashboard</div>
-            {notifCount ? (
-              <div className={styles.notifCount}>{notifCount}</div>
-            ) : (
-              <div style={{ opacity: 0 }} className={styles.notifCount}>
-                0
-              </div>
-            )}
+            <div className={styles.navTitle}>My Tasks</div>
           </div>
           <div
             className={styles.navItem}
@@ -277,27 +256,20 @@ export default function MainLayout({ children, style, match }) {
           <div className={styles.navItemsContainer}>
             <div
               className={styles.navItem}
-              onClick={() => history.push(DashboardLocation)}
+              onClick={() => history.push(MyTasksLocation)}
               style={{
                 borderBottom:
-                  match?.path === DashboardLocation
+                  match?.path === MyTasksLocation
                     ? "4px solid #fff"
                     : "4px solid transparent",
               }}
             >
               <img
-                src={notificationIcon}
-                alt={"time"}
+                src={taskIcon}
+                alt={"task"}
                 style={{ width: "16px" }}
               />
-              <div className={styles.navTitle}>Dashboard</div>
-              {notifCount ? (
-                <div className={styles.notifCount}>{notifCount}</div>
-              ) : (
-                <div style={{ opacity: 0 }} className={styles.notifCount}>
-                  0
-                </div>
-              )}
+              <div className={styles.navTitle}>My Tasks</div>
             </div>
             <div
               className={styles.navItem}
