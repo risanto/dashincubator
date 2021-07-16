@@ -109,7 +109,7 @@ router.get(
       req.tokenPayload.isAdmin &&
       (await tasksCollection
         .find({
-          status: "pending",
+          status: { $in: ["pending", "modify"] },
           "createdBy._id": {
             $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
           },
@@ -127,6 +127,7 @@ router.get(
             $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
           },
           requests: { $exists: true, $not: { $size: 0 } },
+          assignee: null
         })
         .toArray());
 

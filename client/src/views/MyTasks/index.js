@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { createUseStyles } from "react-jss";
+import FadeIn from "react-fade-in";
 
 import MainLayout from "../../layouts/MainLayout";
 import Lottie from "react-lottie";
 import * as animationData from "./done.json";
+import TaskListCard from "../../components/TaskListCard";
 
 import { fetchMyTasks } from "../../api/tasksApi";
 
@@ -14,18 +16,9 @@ import CompleteJobView from "../CompleteJob";
 import EditTaskView from "../EditTask";
 import ReviewJobView from "../ReviewJob";
 
-import NotificationItem from "../../components/NotificationItem";
-import checkedIcon from "../Home/images/checked.svg";
+import { Breakpoints } from "../../utils/utils";
 import { CircularProgress } from "@material-ui/core";
 import caretDown from "../Home/images/caretDown.svg";
-import { truncate, Breakpoints } from "../../utils/utils";
-import { useHistory } from "react-router";
-import cx from "classnames";
-import {
-  BountyLocation,
-  ConceptLocation,
-  PaymentsLocation,
-} from "../../Locations";
 
 const defaultOptions = {
   loop: false,
@@ -47,29 +40,6 @@ const useStyles = createUseStyles({
     justifyContent: "space-between",
     flexWrap: "wrap",
   },
-  markAll: {
-    marginLeft: "0px",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    color: "white",
-    fontSize: "12px",
-    marginTop: 0,
-  },
-  mobileHeading: { display: "block", alignItems: "center" },
-  notifBadge: {
-    backgroundColor: "#AD1D73",
-    borderRadius: "4px",
-    color: "white",
-    marginLeft: "6px",
-    minWidth: "15px",
-    minHeight: "17px",
-    userSelect: "none",
-    fontSize: "11px",
-    fontWeight: 600,
-    lineHeight: "13px",
-    padding: "4px",
-  },
   header: {
     color: "rgba(255, 255, 255, 0.8)",
     fontWeight: 600,
@@ -80,7 +50,6 @@ const useStyles = createUseStyles({
   },
   myTasksItemContainer: {
     fontSize: "18px",
-    fontWeight: 600,
     marginTop: "32px",
   },
   myTasksItemHeader: {
@@ -90,6 +59,7 @@ const useStyles = createUseStyles({
     userSelect: "none",
   },
   index: {
+    backgroundColor: "#E8E8E8",
     width: "18px",
     height: "18px",
     display: "flex",
@@ -101,26 +71,7 @@ const useStyles = createUseStyles({
     marginRight: "12px",
     flexShrink: 0,
   },
-  quote: {
-    marginTop: "4px",
-    backgroundColor: "#D6E4EC",
-    borderRadius: "4px",
-    padding: "8px",
-    fontSize: "12px",
-  },
-  rightColumn: { marginLeft: "0px", flexShrink: 0, marginTop: "24px" },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
-    markAll: {
-      marginLeft: "24px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      color: "white",
-      fontSize: "12px",
-      marginTop: 0,
-    },
-    mobileHeading: { display: "flex", alignItems: "center" },
-    rightColumn: { marginLeft: "24px", flexShrink: 0, marginTop: "0px" },
     container: {
       maxWidth: "1050px",
       margin: "auto",
@@ -135,14 +86,15 @@ const useStyles = createUseStyles({
 });
 
 export default function MyTasksView({ match }) {
-  const [loading, setLoading] = useState(false);
   const [myTasksLoading, setMyTasksLoading] = useState(false);
   const [myTasksItems, setMyTasksItems] = useState(null);
+  const [refetch, setRefetch] = useState(true);
 
   const [showWorkingOnTasks, setShowWorkingOnTasks] = useState(true);
   const [showPendingClaimsTasks, setShowPendingClaimsTasks] = useState(true);
   const [showPendingBidsTasks, setShowPendingBidsTasks] = useState(true);
-  const [showClaimsToProcessTasks, setShowClaimsToProcessTasks] = useState(true);
+  const [showClaimsToProcessTasks, setShowClaimsToProcessTasks] =
+    useState(true);
   const [showBidsToProcessTasks, setShowBidsToProcessTasks] = useState(true);
   const [showManagingTasks, setShowManagingTasks] = useState(true);
   const [showTasksToPay, setShowTasksToPay] = useState(true);
@@ -156,28 +108,16 @@ export default function MyTasksView({ match }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showJobReviewModal, setShowJobReviewModal] = useState(false);
 
-  const [notifications, setNotifications] = useState(null);
-  const [showPendingConcepts, setShowPendingConcepts] = useState(false);
-  const [showPendingContributorModify, setShowPendingContributorModify] =
-    useState(false);
-  const [
-    showPendingContributorCompletion,
-    setShowPendingContributorCompletion,
-  ] = useState(false);
-  const [showPendingAdminApproval, setShowPendingAdminApproval] =
-    useState(false);
-
-  const history = useHistory();
-
   const styles = useStyles();
 
-  function isAllEmpty() {
-    return (
-      Object.keys(myTasksItems).every(function (key) {
-        return myTasksItems[key].length === 0;
-      }) === true
-    );
-  }
+  const isAllEmpty = useMemo(() => {
+    if (myTasksItems)
+      return (
+        Object.keys(myTasksItems).every(function (key) {
+          return myTasksItems[key].length === 0;
+        }) === true
+      );
+  }, [myTasksItems]);
 
   useEffect(() => {
     async function fetchData() {
@@ -187,13 +127,18 @@ export default function MyTasksView({ match }) {
 
         setMyTasksItems(myTasks);
         setMyTasksLoading(false);
-        console.log(myTasks);
+        setRefetch(false);
       } catch (error) {
         console.log("Error in My Tasks ===>", error);
       }
     }
-    fetchData();
-  }, []);
+    if (
+      !myTasksItems || // the first fetch when there's no data
+      (myTasksItems && refetch) // another fetch when data is updated
+    ) {
+      fetchData();
+    }
+  }, [myTasksItems, refetch]);
 
   function renderDropdown({
     setShowTaskItems,
@@ -207,7 +152,7 @@ export default function MyTasksView({ match }) {
           className={styles.myTasksItemHeader}
           onClick={() => setShowTaskItems(!showTaskItems)}
         >
-          <div>{headline}</div>
+          <div style={{ fontWeight: 600 }}>{headline}</div>
           <img
             src={caretDown}
             alt="dropdown"
@@ -219,31 +164,13 @@ export default function MyTasksView({ match }) {
           />
         </div>
         {showTaskItems && (
-          <div>
-            {taskItems.map((item, i) => (
-              <div
-                style={{
-                  marginTop: "24px",
-                  color: "white",
-                  fontSize: "12px",
-                  fontWeight: "normal",
-                  display: "flex",
-                  alignItems: "center",
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  setTask(item);
-                  setShowDetailsModal(true);
-                }}
-              >
-                <div className={styles.index}>{i + 1}</div>
-                <div
-                  style={{ textDecoration: "underline" }}
-                  dangerouslySetInnerHTML={{
-                    __html: item.description,
-                  }}
-                />
-              </div>
+          <div
+            style={{
+              marginTop: "1rem",
+            }}
+          >
+            {taskItems.map((task, i) => (
+              <TaskListCard taskData={task} key={i} />
             ))}
           </div>
         )}
@@ -257,7 +184,9 @@ export default function MyTasksView({ match }) {
         <TaskDetailsView
           task={task}
           open={showDetailsModal}
-          onClose={() => setShowDetailsModal(false)}
+          onClose={() => {
+            setShowDetailsModal(false);
+          }}
           onReview={() => {
             setShowDetailsModal(false);
             setShowReviewModal(true);
@@ -287,6 +216,7 @@ export default function MyTasksView({ match }) {
           open={showReviewModal}
           onClose={(e, data) => {
             setShowReviewModal(false);
+            setRefetch(true);
             if (data) {
               setTask(data);
             }
@@ -299,6 +229,7 @@ export default function MyTasksView({ match }) {
           open={showCompleteModal}
           onClose={(e, data) => {
             setShowCompleteModal(false);
+            setRefetch(true);
             if (data) {
               setTask(data);
             }
@@ -311,6 +242,7 @@ export default function MyTasksView({ match }) {
           open={showCompleteJobModal}
           onClose={(e, data) => {
             setShowCompleteJobModal(false);
+            setRefetch(true);
             if (data) {
               setTask(data);
             }
@@ -323,6 +255,7 @@ export default function MyTasksView({ match }) {
           open={showEditModal}
           onClose={(e, submit, data) => {
             setShowEditModal(false);
+            setRefetch(true);
             if (submit) {
               setTask(data);
             }
@@ -336,6 +269,7 @@ export default function MyTasksView({ match }) {
           open={showJobReviewModal}
           onClose={(e, data) => {
             setShowJobReviewModal(false);
+            setRefetch(true);
             if (data) {
               setTask(data);
             }
@@ -354,7 +288,7 @@ export default function MyTasksView({ match }) {
                   <CircularProgress style={{ color: "white" }} />
                 </div>
               ) : // Show "You're all caught up" if every key in myTaskItems is an empty array
-              isAllEmpty() ? (
+              isAllEmpty ? (
                 <div
                   style={{
                     display: "flex",
@@ -375,87 +309,72 @@ export default function MyTasksView({ match }) {
                   </div>
                 </div>
               ) : (
-                <div>
+                <FadeIn>
                   {/* 1. Tasks you’re working on -> Tasks the user has been assigned but not created a Claim for yet */}
-                  {myTasksItems.workingOn?.length > 0 && renderDropdown({
-                    setShowTaskItems: setShowWorkingOnTasks,
-                    showTaskItems: showWorkingOnTasks,
-                    taskItems: myTasksItems.workingOn,
-                    headline: "Tasks You're Working On",
-                  })}
+                  {myTasksItems.workingOn?.length > 0 &&
+                    renderDropdown({
+                      setShowTaskItems: setShowWorkingOnTasks,
+                      showTaskItems: showWorkingOnTasks,
+                      taskItems: myTasksItems.workingOn,
+                      headline: "Tasks You're Working On",
+                    })}
 
                   {/* 2. Pending Claims -> Claims the user has made (on Tasks they want to claim) */}
-                  {myTasksItems.pendingClaims?.length > 0 && renderDropdown({
-                    setShowTaskItems: setShowPendingClaimsTasks,
-                    showTaskItems: showPendingClaimsTasks,
-                    taskItems: myTasksItems.pendingClaims,
-                    headline: "Pending Claims",
-                  })}
+                  {myTasksItems.pendingClaims?.length > 0 &&
+                    renderDropdown({
+                      setShowTaskItems: setShowPendingClaimsTasks,
+                      showTaskItems: showPendingClaimsTasks,
+                      taskItems: myTasksItems.pendingClaims,
+                      headline: "Pending Claims",
+                    })}
 
                   {/* 3. Pending Bids -> Bids the user has made (on Tasks they want to reserve) */}
-                  {myTasksItems.pendingBids?.length > 0&& renderDropdown({
-                    setShowTaskItems: setShowPendingBidsTasks,
-                    showTaskItems: showPendingBidsTasks,
-                    taskItems: myTasksItems.pendingBids,
-                    headline: "Pending Bids",
-                  })}
+                  {myTasksItems.pendingBids?.length > 0 &&
+                    renderDropdown({
+                      setShowTaskItems: setShowPendingBidsTasks,
+                      showTaskItems: showPendingBidsTasks,
+                      taskItems: myTasksItems.pendingBids,
+                      headline: "Pending Bids",
+                    })}
 
                   {/* 4. Claims to Process -> Claims on Tasks the user is the Admin owner of (on uncompleted Tasks) */}
-                  {myTasksItems.claimsToProcess?.length > 0 && renderDropdown({
-                    setShowTaskItems: setShowClaimsToProcessTasks,
-                    showTaskItems: showClaimsToProcessTasks,
-                    taskItems: myTasksItems.claimsToProcess,
-                    headline: "Claims to Process",
-                  })}
+                  {myTasksItems.claimsToProcess?.length > 0 &&
+                    renderDropdown({
+                      setShowTaskItems: setShowClaimsToProcessTasks,
+                      showTaskItems: showClaimsToProcessTasks,
+                      taskItems: myTasksItems.claimsToProcess,
+                      headline: "Claims to Process",
+                    })}
 
                   {/* 5. Bids to Process -> Bids on Tasks the user is the Admin owner of */}
-                  {myTasksItems.bidsToProcess?.length > 0 && renderDropdown({
-                    setShowTaskItems: setShowBidsToProcessTasks,
-                    showTaskItems: showBidsToProcessTasks,
-                    taskItems: myTasksItems.bidsToProcess,
-                    headline: "Bids to Process",
-                  })}
+                  {myTasksItems.bidsToProcess?.length > 0 &&
+                    renderDropdown({
+                      setShowTaskItems: setShowBidsToProcessTasks,
+                      showTaskItems: showBidsToProcessTasks,
+                      taskItems: myTasksItems.bidsToProcess,
+                      headline: "Bids to Process",
+                    })}
 
                   {/* 6. Tasks you’re managing -> Tasks the Admin user owns that are in progress */}
-                  {myTasksItems.managing?.length > 0 && renderDropdown({
-                    setShowTaskItems: setShowManagingTasks,
-                    showTaskItems: showManagingTasks,
-                    taskItems: myTasksItems.managing,
-                    headline: "Tasks You're Managing",
-                  })}
+                  {myTasksItems.managing?.length > 0 &&
+                    renderDropdown({
+                      setShowTaskItems: setShowManagingTasks,
+                      showTaskItems: showManagingTasks,
+                      taskItems: myTasksItems.managing,
+                      headline: "Tasks You're Managing",
+                    })}
 
                   {/* 7. Tasks to pay -> Completed Tasks from all users that are unpaid */}
-                  {myTasksItems.tasksToPay?.length > 0 && renderDropdown({
-                    setShowTaskItems: setShowTasksToPay,
-                    showTaskItems: showTasksToPay,
-                    taskItems: myTasksItems.tasksToPay,
-                    headline: "Tasks You're Managing",
-                  })}
-                </div>
+                  {myTasksItems.tasksToPay?.length > 0 &&
+                    renderDropdown({
+                      setShowTaskItems: setShowTasksToPay,
+                      showTaskItems: showTasksToPay,
+                      taskItems: myTasksItems.tasksToPay,
+                      headline: "Tasks To Pay",
+                    })}
+                </FadeIn>
               )}
             </div>
-          </div>
-          <div className={styles.rightColumn}>
-            {notifications?.length > 0 && (
-              <>
-                <div className={cx(styles.header, styles.mobileHeading)}>
-                  <div>
-                    NOTIFICATIONS{" "}
-                    {notifications.filter((notif) => !notif.isRead).length >
-                      0 && (
-                      <span className={styles.notifBadge}>
-                        {notifications.filter((notif) => !notif.isRead).length}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div style={{ marginTop: "32px" }}>
-                  {notifications?.map((notification) => (
-                    <NotificationItem notification={notification} />
-                  ))}
-                </div>
-              </>
-            )}
           </div>
         </div>
       </MainLayout>
