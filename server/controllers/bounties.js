@@ -13,7 +13,34 @@ const notificationsCollection = getTable("notifications");
 router.get(
   "/",
   ...authHandlers(async (req, res) => {
-    bountiesCollection.find({ type: "bounty" }).toArray((err, bounties) => {
+    bountiesCollection.aggregate([
+      { $match: { type: "bounty" } },
+      {
+        $lookup: {
+          from: "tasks",
+          localField: "_id",
+          foreignField: "bountyID",
+          as: "tasks",
+        }
+      },
+      {
+        $lookup: {
+          from: "activity",
+          localField: "_id",
+          foreignField: "bountyID",
+          as: "comments"
+        }
+      },
+      {
+        $lookup: {
+          from: "tasks",
+          localField: "_id",
+          foreignField: "bountyID",
+          as: "tasks"
+        }
+      }
+    ])
+      .toArray((err, bounties) => {
       res.send(
         bounties.sort(
           (a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)
@@ -105,6 +132,28 @@ router.get(
       })
       .toArray();
     res.send(result.sort((a, b) => new Date(b.date) - new Date(a.date)));
+  })
+);
+
+router.put(
+  "/comment/:id/last-seen",
+  ...authHandlers(async (req, res) => {
+    // Read out comments
+    try {
+      await activityCollection.updateMany(
+        {
+          $or: [
+            {bountyID: ObjectID(req.params.id), activityLevel: "task"},
+            {bountyID: ObjectID(req.params.id), activityLevel: "bounty"},
+          ]
+        },
+        {$set: {lastViewedAt: new Date()}}
+      );
+
+      res.send({message: "success"});
+    } catch (e) {
+      res.status(500).send({message: e.message});
+    }
   })
 );
 
@@ -206,7 +255,7 @@ router.put(
   "/update",
   ...authHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
-      res.send({ error: "Insufficient permissions" });
+      res.status(403).send({ error: "Insufficient permissions" });
     } else {
       const newData = { ...req.body };
       delete newData._id;

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import {
-  ActivityLocation,
+  ActivityLocation, BountiesLocation,
   ConceptsLocation,
   MyTasksLocation,
   PaymentsLocation,
@@ -74,7 +74,7 @@ const useStyles = createUseStyles({
     padding: "4px",
   },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
-    container: { maxWidth: "1050px", margin: "auto", padding: "0 88px" },
+    container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
     logoText: {
       display: "block",
       marginLeft: "8px",
@@ -123,6 +123,10 @@ export default function MainLayout({ children, style, match }) {
     history.push(ConceptsLocation);
   }, [history]);
 
+  const handleBounties = useCallback(() => {
+    history.push(BountiesLocation);
+  }, [history]);
+
   return (
     <div style={{ backgroundColor: "#008de4", minHeight: "100vh" }}>
       <DashModal open={showNav} onClose={() => setShowNav(false)}>
@@ -159,6 +163,14 @@ export default function MainLayout({ children, style, match }) {
           >
             <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
             <div className={styles.navTitle}>Concepts</div>
+          </div>
+          <div
+            className={styles.navItem}
+            style={{ marginTop: "24px" }}
+            onClick={handleBounties}
+          >
+            <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
+            <div className={styles.navTitle}>Bounties</div>
           </div>
           <div
             className={styles.navItem}
@@ -262,7 +274,7 @@ export default function MainLayout({ children, style, match }) {
             <div
               className={styles.navItem}
               style={{
-                marginLeft: "32px",
+                marginLeft: "16px",
                 borderBottom:
                   match?.path === ConceptsLocation
                     ? "4px solid #fff"
@@ -276,7 +288,21 @@ export default function MainLayout({ children, style, match }) {
             <div
               className={styles.navItem}
               style={{
-                marginLeft: "32px",
+                marginLeft: "16px",
+                borderBottom:
+                  match?.path === BountiesLocation
+                    ? "4px solid #fff"
+                    : "4px solid transparent",
+              }}
+              onClick={handleBounties}
+            >
+              <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
+              <div className={styles.navTitle}>Bounties</div>
+            </div>
+            <div
+              className={styles.navItem}
+              style={{
+                marginLeft: "16px",
                 borderBottom:
                   match?.path === ActivityLocation
                     ? "4px solid #fff"
@@ -290,7 +316,7 @@ export default function MainLayout({ children, style, match }) {
             <div
               className={styles.navItem}
               style={{
-                marginLeft: "32px",
+                marginLeft: "16px",
                 borderBottom:
                   match?.path === PaymentsLocation
                     ? "4px solid #fff"
@@ -308,7 +334,7 @@ export default function MainLayout({ children, style, match }) {
                 alt={"time"}
                 style={{
                   width: "16px",
-                  margin: "0px 32px",
+                  margin: "0px 16px",
                   cursor: "pointer",
                   userSelect: "none",
                 }}
