@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useCallback} from "react";
 import { createUseStyles } from "react-jss";
 import MainLayout from "../../layouts/MainLayout";
-import { fetchDashboard, fetchNotifications } from "../../api/global";
+import { fetchNotifications } from "../../api/global";
 import NotificationItem from "../../components/NotificationItem";
 import checkedIcon from "../Tasks/images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
