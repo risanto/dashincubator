@@ -1,33 +1,17 @@
 import React, {useState, useEffect, useCallback} from "react";
 import { createUseStyles } from "react-jss";
 import MainLayout from "../../layouts/MainLayout";
-import Lottie from "react-lottie";
-import * as animationData from "../MyTasks/done.json";
 import { fetchDashboard, fetchNotifications } from "../../api/global";
 import NotificationItem from "../../components/NotificationItem";
 import checkedIcon from "../Tasks/images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
 import { readAllNotifications } from "../../api/notificationsApi";
-import caretDown from "../Tasks/images/caretDown.svg";
-import { truncate, Breakpoints } from "../../utils/utils";
+import { Breakpoints } from "../../utils/utils";
 import { useHistory } from "react-router-dom";
 import cx from "classnames";
-import {
-  BountyLocation,
-  ConceptLocation,
-  PaymentsLocation, ProfileLocation,
-} from "../../Locations";
+import { ProfileLocation } from "../../Locations";
 import useGlobalState from "../../state";
 import MyTasksView from "../MyTasks";
-
-const defaultOptions = {
-  loop: false,
-  autoplay: true,
-  animationData: animationData.default,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
-  },
-};
 
 const useStyles = createUseStyles({
   container: {
@@ -152,19 +136,7 @@ const useStyles = createUseStyles({
 
 export default function DashboardView({ match }) {
   const [notifications, setNotifications] = useState(null);
-  const [dashboardItems, setDashboardItems] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dashboardLoading, setDashboardLoading] = useState(false);
-  const [showPendingConcepts, setShowPendingConcepts] = useState(false);
-  const [showPendingContributorModify, setShowPendingContributorModify] =
-    useState(false);
-  const [
-    showPendingContributorCompletion,
-    setShowPendingContributorCompletion,
-  ] = useState(false);
-  const [showPendingAdminApproval, setShowPendingAdminApproval] =
-    useState(false);
-  const [showUnpaidTasks, setShowUnpaidTasks] = useState(false);
   const { loggedInUser } = useGlobalState();
   const history = useHistory();
 
@@ -182,13 +154,6 @@ export default function DashboardView({ match }) {
   };
 
   useEffect(() => {
-    setDashboardLoading(true);
-    fetchDashboard()
-      .then((data) => data.json())
-      .then((result) => {
-        setDashboardItems(result);
-        setDashboardLoading(false);
-      });
     fetchNotifications()
       .then((data) => data.json())
       .then((result) => setNotifications(result));
