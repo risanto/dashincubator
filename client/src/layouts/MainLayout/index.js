@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import clsx from "clsx";
 import { useHistory } from "react-router-dom";
 import {
-  ActivityLocation, BountiesLocation,
+  BountiesLocation,
   ConceptsLocation,
   MyTasksLocation,
   PaymentsLocation,
@@ -17,13 +17,10 @@ import dashLogo from "../../views/Login/images/dashLogo.svg";
 import checkboxIcon from "./images/checkbox.svg";
 import { createUseStyles } from "react-jss";
 import { Breakpoints } from "../../utils/utils";
-import timeIcon from "./images/time.svg";
-import notificationIcon from "./images/notification.svg";
 import UserAvatar from "../../components/UserAvatar";
 import { countNotifications } from "../../api/notificationsApi";
 import { fetchDashboardCount } from "../../api/global";
 import hamburgerIcon from "./images/hamburger.svg";
-import taskIcon from "./images/task.svg";
 import DashModal from "../../components/DashModal";
 import homeIcon from "./images/home.svg";
 

@@ -2,7 +2,6 @@ import { CircularProgress } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import { fetchActivity } from "../../api/global";
-import MainLayout from "../../layouts/MainLayout";
 import moment from "moment";
 import ActivityGroup from "../../components/ActivityGroup";
 import searchIcon from "../Tasks/images/search.svg";

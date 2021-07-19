@@ -28,7 +28,7 @@ export default function UserAvatar({
         history.push(ProfileLocation(user.username));
       }
     }
-  }, [user, disabled, history]);
+  }, [isProfile, user, disabled, history]);
 
   return (
     <>

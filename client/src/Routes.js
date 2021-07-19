@@ -21,9 +21,7 @@ import {
   LoginLocation,
 } from "./Locations";
 import ScrollToTop from "./utils/ScrollToTop";
-import useGlobalState from "./state";
 import HomeView from "./views/Home";
-import { getAuthToken } from "./api/serverRequest";
 import LoginView from "./views/Login";
 import RequestNewConceptView from "./views/RequestNewConcept";
 import ConceptView from "./views/Concept";
@@ -39,21 +37,21 @@ import UpdatePasswordView from "./views/UpdatePassword";
 import BountiesView from "./views/Bounties";
 import TasksView from "./views/Tasks";
 
-function isAuthMatch(withAuth, loggedInUser, token) {
-  if (!withAuth) {
-    return true;
-  }
-  if (token) {
-    return true;
-  }
-  return withAuth && loggedInUser;
-}
+// function isAuthMatch(withAuth, loggedInUser, token) {
+//   if (!withAuth) {
+//     return true;
+//   }
+//   if (token) {
+//     return true;
+//   }
+//   return withAuth && loggedInUser;
+// }
 
 const CustomRoute = (props) => {
   const { path, redirect, withAuth, component, ...leftProps } = props;
-  const { loggedInUser } = useGlobalState();
+  // const { loggedInUser } = useGlobalState();
 
-  const token = getAuthToken();
+  // const token = getAuthToken();
 
   // if (!isAuthMatch(withAuth, loggedInUser, token)) {
   //   let to = LoginLocation;
