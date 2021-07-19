@@ -1,6 +1,6 @@
-import React from "react";
-import { useHistory } from "react-router";
-import { ProfileLocation } from "../Locations";
+import React, {useCallback} from "react";
+import { useHistory } from "react-router-dom";
+import { ProfileLocation, DashboardLocation } from "../Locations";
 import Tooltip from "@material-ui/core/Tooltip";
 import { withStyles } from "@material-ui/core";
 
@@ -16,8 +16,20 @@ export default function UserAvatar({
   fontSize,
   lineHeight,
   disabled,
+  isProfile
 }) {
   const history = useHistory();
+
+  const handleUserProfile = useCallback(() => {
+    if (!disabled) {
+      if (isProfile) {
+        history.push(DashboardLocation);
+      } else {
+        history.push(ProfileLocation(user.username));
+      }
+    }
+  }, [user, disabled, history]);
+
   return (
     <>
       {user && (
@@ -37,9 +49,7 @@ export default function UserAvatar({
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "cover",
                 }}
-                onClick={() => {
-                  !disabled && history.push(ProfileLocation(user.username));
-                }}
+                onClick={handleUserProfile}
               />
             </StyledTooltip>
           ) : (
@@ -62,9 +72,7 @@ export default function UserAvatar({
                   cursor: disabled ? "auto" : "pointer",
                   userSelect: "none",
                 }}
-                onClick={() => {
-                  !disabled && history.push(ProfileLocation(user.username));
-                }}
+                onClick={handleUserProfile}
               >
                 {user.username.substring(0, 2).toUpperCase()}
               </div>

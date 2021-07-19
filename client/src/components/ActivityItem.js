@@ -327,7 +327,7 @@ export default function ActivityItem({
                       : "bounty"}
                   </div>
                 )}
-                {loggedInUser.username === item.sourceUser.username && (
+                {loggedInUser && loggedInUser.username === item.sourceUser.username && (
                   <>
                     <span
                       style={{ marginLeft: "6px", cursor: "pointer" }}

@@ -11,7 +11,7 @@ import DashModal from "../../components/DashModal";
 import doneIcon from "../Concept/images/done.svg";
 import { isValidURL, toolbarConfig, Breakpoints } from "../../utils/utils";
 import removeIcon from "./images/close.svg";
-import plusIcon from "../Home/images/add.svg";
+import plusIcon from "../Tasks/images/add.svg";
 
 const useStyles = createUseStyles({
   inputTitle: {

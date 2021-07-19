@@ -19,7 +19,7 @@ import { getAdminsSimple } from "../../api/usersApi";
 import deleteIcon from "../RequestNewConcept/images/close.svg";
 import RichTextEditor from "react-rte";
 import FadeIn from "react-fade-in";
-import plusIcon from "../Home/images/add.svg";
+import plusIcon from "../Tasks/images/add.svg";
 import programmeIcon from "../ApproveConcept/images/programme.svg";
 
 const useStyles = createUseStyles({

@@ -15,14 +15,16 @@ import {
   DashboardLocation,
   UserManagementLocation,
   ResetPasswordLocation,
-  UpdatePasswordLocation, BountiesLocation,
+  UpdatePasswordLocation,
+  BountiesLocation,
+  TasksLocation,
+  LoginLocation,
 } from "./Locations";
 import ScrollToTop from "./utils/ScrollToTop";
 import useGlobalState from "./state";
 import HomeView from "./views/Home";
 import { getAuthToken } from "./api/serverRequest";
 import LoginView from "./views/Login";
-import { LoginLocation } from "./Locations";
 import RequestNewConceptView from "./views/RequestNewConcept";
 import ConceptView from "./views/Concept";
 import ConceptsView from "./views/Concepts";
@@ -35,6 +37,7 @@ import UserManagementView from "./views/UserManagement";
 import ResetPasswordView from "./views/ResetPassword";
 import UpdatePasswordView from "./views/UpdatePassword";
 import BountiesView from "./views/Bounties";
+import TasksView from "./views/Tasks";
 
 function isAuthMatch(withAuth, loggedInUser, token) {
   if (!withAuth) {
@@ -52,10 +55,10 @@ const CustomRoute = (props) => {
 
   const token = getAuthToken();
 
-  if (!isAuthMatch(withAuth, loggedInUser, token)) {
-    let to = LoginLocation;
-    return <Redirect from={path} to={to} {...leftProps} />;
-  }
+  // if (!isAuthMatch(withAuth, loggedInUser, token)) {
+  //   let to = LoginLocation;
+  //   return <Redirect from={path} to={to} {...leftProps} />;
+  // }
 
   if (redirect) {
     return <Redirect from={path} to={redirect} {...leftProps} />;
@@ -69,44 +72,50 @@ const routes = [
   {
     path: RootLocation,
     exact: true,
-    withAuth: true,
+    withAuth: false,
     component: HomeView,
   },
   { path: LoginLocation, exact: true, component: LoginView },
   {
+    path: TasksLocation,
+    exact: true,
+    withAuth: false,
+    component: TasksView,
+  },
+  {
     path: ConceptsLocation,
     exact: true,
-    withAuth: true,
+    withAuth: false,
     component: ConceptsView,
   },
   {
     path: BountiesLocation,
     exact: true,
-    withAuth: true,
+    withAuth: false,
     component: BountiesView,
   },
   {
     path: RequestNewConceptLocation,
     exact: true,
-    withAuth: true,
+    withAuth: false,
     component: RequestNewConceptView,
   },
   {
     path: PaymentsLocation,
     exact: true,
-    withAuth: true,
+    withAuth: false,
     component: PaymentsView,
   },
   {
     path: ConceptLocationTemplate,
     exact: true,
-    withAuth: true,
+    withAuth: false,
     component: ConceptView,
   },
   {
     path: EditConceptLocationTemplate,
     exact: true,
-    withAuth: true,
+    withAuth: false,
     component: ConceptView,
   },
   {

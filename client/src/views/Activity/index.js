@@ -5,7 +5,7 @@ import { fetchActivity } from "../../api/global";
 import MainLayout from "../../layouts/MainLayout";
 import moment from "moment";
 import ActivityGroup from "../../components/ActivityGroup";
-import searchIcon from "../Home/images/search.svg";
+import searchIcon from "../Tasks/images/search.svg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { longhandRelative, Breakpoints } from "../../utils/utils";
@@ -20,11 +20,11 @@ function datesGroupByComponent(dates, token) {
 
 const useStyles = createUseStyles({
   container: {
-    maxWidth: "100vw",
-    margin: "auto",
-    padding: "0 24px 88px 24px",
-    marginTop: "32px",
+    marginTop: 28,
     color: "#0B0F3B",
+  },
+  activityTitle: {
+    color: "white",
   },
   searchInput: {
     border: "none",
@@ -33,7 +33,7 @@ const useStyles = createUseStyles({
     width: "100%",
     color: "white",
     lineHeight: "15px",
-    fontSize: "12px",
+    fontSize: 12,
     "&::placeholder": {
       color: "rgba(255, 255, 255, 0.5)",
     },
@@ -58,6 +58,7 @@ const useStyles = createUseStyles({
     alignItems: "center",
     flexWrap: "wrap",
     justifyContent: "space-between",
+    height: 32,
   },
   searchIcon: {
     margin: "8px",
@@ -99,9 +100,6 @@ const useStyles = createUseStyles({
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     container: {
       maxWidth: "1050px",
-      margin: "auto",
-      padding: "0 88px 88px 88px",
-      marginTop: "32px",
       color: "#0B0F3B",
     },
     searchContainer: {
@@ -152,8 +150,8 @@ export default function ActivityView({ match }) {
   }, [startDate, endDate, activityData]);
 
   return (
-    <MainLayout match={match}>
-      <div className={styles.container} style={{ marginTop: "48px" }}>
+      <div className={styles.container}>
+        <div className={styles.activityTitle}>Activities</div>
         {activity && (
           <div className={styles.searchContainer}>
             <div className={styles.searchIconContainer}>
@@ -215,6 +213,5 @@ export default function ActivityView({ match }) {
           </div>
         )}
       </div>
-    </MainLayout>
   );
 }

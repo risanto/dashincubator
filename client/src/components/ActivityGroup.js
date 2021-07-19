@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ActivityItem from "./ActivityItem";
 import moment from "moment";
-import caretDown from "../views/Home/images/caretDown.svg";
+import caretDown from "../views/Tasks/images/caretDown.svg";
 import { Badge, makeStyles } from "@material-ui/core";
 import { createUseStyles } from "react-jss";
 

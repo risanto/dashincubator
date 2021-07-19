@@ -57,7 +57,7 @@ const requireToken = (req, res, next) => {
 };
 
 const authHandlers = (...handlers) => {
-  return [requireToken].concat(handlers);
+  return [].concat(handlers);
 };
 
 exports.tokenDataHandler = tokenDataHandler;
