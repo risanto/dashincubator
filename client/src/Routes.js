@@ -12,7 +12,7 @@ import {
   PaymentsLocation,
   ProfileLocationTemplate,
   ActivityLocation,
-  DashboardLocation,
+  MyTasksLocation,
   UserManagementLocation,
   ResetPasswordLocation,
   UpdatePasswordLocation,
@@ -32,7 +32,7 @@ import BountyView from "./views/Bounty";
 import PaymentsView from "./views/Payments";
 import ProfileView from "./views/Profile";
 import ActivityView from "./views/Activity";
-import DashboardView from "./views/Dashboard";
+import MyTasksView from "./views/MyTasks";
 import UserManagementView from "./views/UserManagement";
 import ResetPasswordView from "./views/ResetPassword";
 import UpdatePasswordView from "./views/UpdatePassword";
@@ -149,10 +149,10 @@ const routes = [
     component: ActivityView,
   },
   {
-    path: DashboardLocation,
+    path: MyTasksLocation,
     exact: true,
     withAuth: true,
-    component: DashboardView,
+    component: MyTasksView,
   },
   {
     path: UserManagementLocation,

@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import {
   ActivityLocation, BountiesLocation,
   ConceptsLocation,
-  DashboardLocation,
+  MyTasksLocation,
   PaymentsLocation,
   ProfileLocation,
   RootLocation, TasksLocation,
@@ -23,6 +23,7 @@ import UserAvatar from "../../components/UserAvatar";
 import { countNotifications } from "../../api/notificationsApi";
 import { fetchDashboardCount } from "../../api/global";
 import hamburgerIcon from "./images/hamburger.svg";
+import taskIcon from "./images/task.svg";
 import DashModal from "../../components/DashModal";
 import homeIcon from "./images/home.svg";
 

@@ -9,7 +9,10 @@ import specIcon from "./images/spec.svg";
 import productionIcon from "./images/production.svg";
 import qaIcon from "./images/qa.svg";
 import useGlobalState from "../../state";
+
 import { createTask, updateTask } from "../../api/tasksApi";
+import { getBounty } from "../../api/bountiesApi";
+
 import UserAvatar from "../../components/UserAvatar";
 import Textarea from "../../components/Textarea";
 import DateFnsUtils from "@date-io/date-fns";
@@ -132,6 +135,7 @@ const useMUIStyles = makeStyles({
 
 export default function EditTaskView({ open, onClose, concept, task }) {
   const [loading, setLoading] = useState(false);
+  const [conceptData, setConceptData] = useState(concept);
   const [description, setDescription] = useState(task ? task.description : "");
   const [type, setType] = useState(task ? task.taskType : "spec");
   const [date, setDate] = useState(task && task.date ? task.date : new Date());
@@ -141,9 +145,8 @@ export default function EditTaskView({ open, onClose, concept, task }) {
   const [assignee, setAssignee] = useState(task ? task.assignee : null);
   const [error, setError] = useState(null);
   const { loggedInUser } = useGlobalState();
-  //const [tags, setTags] = useState([]);
-  const styles = useStyles();
 
+  const styles = useStyles();
   const classes = useMUIStyles();
 
   const priceError =
@@ -164,14 +167,24 @@ export default function EditTaskView({ open, onClose, concept, task }) {
       "https://rates2.dashretail.org/rates?source=dashretail&symbol=dashusd"
     )
       .then((result) => result.json())
-      .then((data) => setDashRate(data[0]?.price));
-  }, []);
+      .then((data) => {
+        setDashRate(data[0]?.price);
 
-  useEffect(() => {
-    fetchUsersSimple().then((users) =>
-      setUsers(users.filter((user) => user.username !== loggedInUser?.username))
-    );
-    //eslint-disable-next-line
+        fetchUsersSimple().then((users) => {
+          setUsers(
+            users.filter((user) => user.username !== loggedInUser?.username)
+          );
+
+          if (!conceptData) {
+            getBounty(task.bountyDisplayURL)
+              .then((data) => data.json())
+              .then((results) => {
+                setConceptData(results);
+              });
+          }
+        });
+      });
+    // eslint-disable-next-line
   }, []);
 
   const resetData = () => {
@@ -214,11 +227,11 @@ export default function EditTaskView({ open, onClose, concept, task }) {
           assignee: assignee,
           dueDate: date,
           payout: payout,
-          bountyTitle: concept.title,
-          bountyType: concept.bountyType,
-          bountyDisplayURL: concept.displayURL,
+          bountyTitle: conceptData?.title,
+          bountyType: conceptData?.bountyType,
+          bountyDisplayURL: conceptData?.displayURL,
         };
-        createTask(data, concept._id).then(() => {
+        createTask(data, conceptData?._id).then(() => {
           resetData();
           setLoading(false);
           onClose(null, true);
@@ -373,7 +386,7 @@ export default function EditTaskView({ open, onClose, concept, task }) {
           <div
             style={{ display: "flex", alignItems: "center", marginTop: "32px" }}
           >
-            {concept.bountyType !== "job" && (
+            {conceptData?.bountyType !== "job" && (
               <div style={{ width: "100%", marginRight: "24px" }}>
                 <div className={styles.inputTitle}>ASSIGNEE</div>
                 <div>

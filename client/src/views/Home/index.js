@@ -1,7 +1,6 @@
 import React from "react";
 import useGlobalState from "../../state";
 import LoginView from "../Login";
-import TasksView from "../Tasks";
 import MainLayout from "../../layouts/MainLayout";
 
 const HomeView = ({ match }) => {
