@@ -2,7 +2,7 @@ import React, {useState, useEffect, useCallback} from "react";
 import { createUseStyles } from "react-jss";
 import MainLayout from "../../layouts/MainLayout";
 import Lottie from "react-lottie";
-import * as animationData from "./done.json";
+import * as animationData from "../MyTasks/done.json";
 import { fetchDashboard, fetchNotifications } from "../../api/global";
 import NotificationItem from "../../components/NotificationItem";
 import checkedIcon from "../Tasks/images/checked.svg";
@@ -10,7 +10,7 @@ import { CircularProgress } from "@material-ui/core";
 import { readAllNotifications } from "../../api/notificationsApi";
 import caretDown from "../Tasks/images/caretDown.svg";
 import { truncate, Breakpoints } from "../../utils/utils";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 import cx from "classnames";
 import {
   BountyLocation,

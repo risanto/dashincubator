@@ -77,6 +77,22 @@ const useStyles = createUseStyles({
     marginBottom: 4,
     marginLeft: 16,
   },
+  avatarWrapper: {
+    position: "relative",
+  },
+  notifications: {
+    position: "absolute",
+    right: -2,
+    top: -2,
+    backgroundColor: "#AD1D73",
+    fontSize: 8,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
     logoText: {
@@ -405,7 +421,13 @@ export default function MainLayout({ children, style, match }) {
                 />
               </Tooltip>
             }
-            <UserAvatar user={loggedInUser} isProfile />
+            <div className={styles.avatarWrapper}>
+              <UserAvatar user={loggedInUser} isProfile />
+              {
+                notifCount &&
+                <div className={styles.notifications}>{notifCount}</div>
+              }
+            </div>
             {
               !loggedInUser &&
               <div className={clsx(styles.navItem, styles.login)} onClick={handleLogin}>Login | Signup</div>

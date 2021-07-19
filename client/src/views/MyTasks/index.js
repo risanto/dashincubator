@@ -18,7 +18,7 @@ import ReviewJobView from "../ReviewJob";
 
 import { Breakpoints } from "../../utils/utils";
 import { CircularProgress } from "@material-ui/core";
-import caretDown from "../Home/images/caretDown.svg";
+import caretDown from "../Tasks/images/caretDown.svg";
 
 const defaultOptions = {
   loop: false,

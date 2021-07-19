@@ -33,6 +33,8 @@ export const ProfileLocation = (username) => `/user/${username}`;
 
 export const ActivityLocation = "/activity";
 
+export const DashboardLocation = "/dashboard";
+
 export const MyTasksLocation = "/my-tasks";
 
 export const UserManagementLocation = "/user-management";

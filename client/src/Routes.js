@@ -19,6 +19,7 @@ import {
   BountiesLocation,
   TasksLocation,
   LoginLocation,
+  DashboardLocation,
 } from "./Locations";
 import ScrollToTop from "./utils/ScrollToTop";
 import HomeView from "./views/Home";
@@ -36,6 +37,7 @@ import ResetPasswordView from "./views/ResetPassword";
 import UpdatePasswordView from "./views/UpdatePassword";
 import BountiesView from "./views/Bounties";
 import TasksView from "./views/Tasks";
+import DashboardView from "./views/Dashboard";
 
 // function isAuthMatch(withAuth, loggedInUser, token) {
 //   if (!withAuth) {
@@ -151,6 +153,12 @@ const routes = [
     exact: true,
     withAuth: true,
     component: MyTasksView,
+  },
+  {
+    path: DashboardLocation,
+    exact: true,
+    withAuth: true,
+    component: DashboardView,
   },
   {
     path: UserManagementLocation,
