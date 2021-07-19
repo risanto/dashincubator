@@ -423,8 +423,7 @@ export default function MainLayout({ children, style, match }) {
             <div className={styles.avatarWrapper}>
               <UserAvatar user={loggedInUser} isProfile />
               {
-                notifCount &&
-                <div className={styles.notifications}>{notifCount}</div>
+                notifCount ? <div className={styles.notifications}>{notifCount}</div> : null
               }
             </div>
             {
