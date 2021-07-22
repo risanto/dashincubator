@@ -1,7 +1,7 @@
 import React from "react";
 import useGlobalState from "../../state";
 import LoginView from "../Login";
-import MainLayout from "../../layouts/MainLayout";
+import DashboardView from "../Dashboard";
 
 const HomeView = ({ match }) => {
   const { loggedInUser } = useGlobalState();
@@ -10,7 +10,7 @@ const HomeView = ({ match }) => {
     return <LoginView match={match} />;
   }
 
-  return <MainLayout match={match}></MainLayout>;
+  return <DashboardView match={match} />;
 };
 
 export default HomeView;

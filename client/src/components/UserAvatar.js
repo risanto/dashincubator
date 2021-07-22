@@ -1,6 +1,6 @@
 import React, {useCallback} from "react";
 import { useHistory } from "react-router-dom";
-import { ProfileLocation, DashboardLocation } from "../Locations";
+import { ProfileLocation } from "../Locations";
 import Tooltip from "@material-ui/core/Tooltip";
 import { withStyles } from "@material-ui/core";
 
@@ -16,19 +16,14 @@ export default function UserAvatar({
   fontSize,
   lineHeight,
   disabled,
-  isProfile
 }) {
   const history = useHistory();
 
   const handleUserProfile = useCallback(() => {
     if (!disabled) {
-      if (isProfile) {
-        history.push(DashboardLocation);
-      } else {
-        history.push(ProfileLocation(user.username));
-      }
+      history.push(ProfileLocation(user.username));
     }
-  }, [isProfile, user, disabled, history]);
+  }, [user, disabled, history]);
 
   return (
     <>

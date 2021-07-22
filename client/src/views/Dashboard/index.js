@@ -7,10 +7,7 @@ import checkedIcon from "../Tasks/images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
 import { readAllNotifications } from "../../api/notificationsApi";
 import { Breakpoints } from "../../utils/utils";
-import { useHistory } from "react-router-dom";
 import cx from "classnames";
-import { ProfileLocation } from "../../Locations";
-import useGlobalState from "../../state";
 import MyTasksView from "../MyTasks";
 
 const useStyles = createUseStyles({
@@ -32,19 +29,6 @@ const useStyles = createUseStyles({
     color: "white",
     fontSize: "12px",
     marginTop: 0,
-  },
-  viewPofile: {
-    backgroundColor: "#0B0F3B",
-    color: "white",
-    borderRadius: "4px",
-    padding: "8px",
-    display: "flex",
-    alignItems: "center",
-    cursor: "pointer",
-    fontSize: "12px",
-    lineHeight: "15px",
-    fontWeight: 600,
-    userSelect: "none",
   },
   mobileHeading: { display: "block", alignItems: "center" },
   notifBadge: {
@@ -137,8 +121,6 @@ const useStyles = createUseStyles({
 export default function DashboardView({ match }) {
   const [notifications, setNotifications] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { loggedInUser } = useGlobalState();
-  const history = useHistory();
 
   const styles = useStyles();
 
@@ -159,19 +141,9 @@ export default function DashboardView({ match }) {
       .then((result) => setNotifications(result));
   }, []);
 
-  const handleViewProfile = useCallback(() => {
-    if (loggedInUser) {
-      history.push(ProfileLocation(loggedInUser.username));
-    }
-  }, [loggedInUser, history]);
-
   return (
     <MainLayout match={match}>
       <div className={styles.container}>
-        {
-          loggedInUser &&
-          <div className={styles.viewPofile} onClick={handleViewProfile}>View Profile</div>
-        }
         <div className={styles.mainContainer}>
           <div className={styles.leftColumn}>
             {notifications?.length > 0 && (
