@@ -56,11 +56,17 @@ const requireToken = (req, res, next) => {
   next();
 };
 
-const authHandlers = (...handlers) => {
+const noAuthHandlers = (...handlers) => {
   return [].concat(handlers);
 };
 
+const authHandlers = (...handlers) => {
+  return [requireToken].concat(handlers);
+};
+
 exports.tokenDataHandler = tokenDataHandler;
+
+exports.noAuthHandlers = noAuthHandlers;
 
 exports.authHandlers = authHandlers;
 

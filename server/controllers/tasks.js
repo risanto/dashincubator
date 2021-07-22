@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { ObjectId, ObjectID } = require("mongodb");
 const { getTable } = require("../dal");
-const { authHandlers } = require("../handlers");
+const { noAuthHandlers, authHandlers } = require("../handlers");
 
 const router = Router();
 const tasksCollection = getTable("tasks");
@@ -12,7 +12,7 @@ const notificationsCollection = getTable("notifications");
 
 router.get(
   "/get/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await tasksCollection.findOne({
       _id: ObjectID(req.params.id),
     });
@@ -22,7 +22,7 @@ router.get(
 
 router.get(
   "/get/:id/activity",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await activityCollection
       .find({
         taskID: ObjectID(req.params.id),
@@ -36,7 +36,7 @@ router.get(
 // Open Tasks data is used on the home page (spec 7.1.1)
 router.get(
   "/open",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await tasksCollection
       .aggregate([
         {
@@ -171,7 +171,7 @@ router.get(
 
 router.get(
   "/completed",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     let jobItems = [];
     const jobs = await tasksCollection
       .find({
@@ -223,7 +223,7 @@ router.get(
 
 router.post(
   "/new",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -278,7 +278,7 @@ router.post(
 
 router.put(
   "/update",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -329,7 +329,7 @@ router.put(
 
 router.put(
   "/request-to-reserve/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const task = await tasksCollection.findOneAndUpdate(
       { _id: ObjectID(req.params.id) },
       { $push: { requests: req.body } },
@@ -367,7 +367,7 @@ router.put(
 
 router.put(
   "/request-to-modify/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -414,7 +414,7 @@ router.put(
 
 router.put(
   "/request-to-approve/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -467,7 +467,7 @@ router.put(
 
 router.put(
   "/request-to-approve-job/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -520,7 +520,7 @@ router.put(
 
 router.put(
   "/payout-concept/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isSuperUser) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -573,7 +573,7 @@ router.put(
 
 router.put(
   "/payout/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isSuperUser) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -721,7 +721,7 @@ router.put(
 
 router.put(
   "/comment/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const commentID = new ObjectID();
 
     const task = await tasksCollection.findOne({
@@ -780,7 +780,7 @@ router.put(
 
 router.put(
   "/comment-edit/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     await notificationsCollection.updateMany(
       { commentID: ObjectId(req.params.id) },
       { $set: { comment: req.body.comment } }
@@ -795,7 +795,7 @@ router.put(
 
 router.put(
   "/request-to-complete/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const completionID = new ObjectID();
     const origTask = await tasksCollection.findOne({
       _id: ObjectID(req.params.id),
@@ -854,7 +854,7 @@ router.put(
 
 router.put(
   "/request-to-complete-job/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const completionID = new ObjectID();
     const task = await tasksCollection.findOneAndUpdate(
       { _id: ObjectID(req.params.id) },
@@ -905,7 +905,7 @@ router.put(
 
 router.put(
   "/activity-viewed/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     // add username with time of view
     const newKey = `lastView.${req.tokenPayload.username}`;
 

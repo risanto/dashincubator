@@ -9,7 +9,7 @@ const jwt = require("express-jwt");
 const cloudinary = require("cloudinary");
 const formData = require("express-form-data");
 const bearerToken = require("express-bearer-token");
-const { tokenDataHandler, authHandlers } = require("./handlers");
+const { tokenDataHandler, noAuthHandlers } = require("./handlers");
 
 const PORT = process.env.PORT || 8080;
 
