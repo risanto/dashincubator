@@ -9,13 +9,6 @@ import TaskListCard from "../../components/TaskListCard";
 
 import { fetchMyTasks } from "../../api/tasksApi";
 
-import TaskDetailsView from "../TaskDetails";
-import ReviewTaskView from "../ReviewTask";
-import CompleteTaskView from "../CompleteTask";
-import CompleteJobView from "../CompleteJob";
-import EditTaskView from "../EditTask";
-import ReviewJobView from "../ReviewJob";
-
 import { Breakpoints } from "../../utils/utils";
 import { CircularProgress } from "@material-ui/core";
 import caretDown from "../Home/images/caretDown.svg";
@@ -99,15 +92,6 @@ export default function MyTasksView({ match }) {
   const [showManagingTasks, setShowManagingTasks] = useState(true);
   const [showTasksToPay, setShowTasksToPay] = useState(true);
 
-  const [task, setTask] = useState(null);
-  const [completionID, setCompletionID] = useState(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const [showCompleteJobModal, setShowCompleteJobModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showJobReviewModal, setShowJobReviewModal] = useState(false);
-
   const styles = useStyles();
 
   const isAllEmpty = useMemo(() => {
@@ -132,6 +116,7 @@ export default function MyTasksView({ match }) {
         console.log("Error in My Tasks ===>", error);
       }
     }
+
     if (
       !myTasksItems || // the first fetch when there's no data
       (myTasksItems && refetch) // another fetch when data is updated
@@ -170,7 +155,11 @@ export default function MyTasksView({ match }) {
             }}
           >
             {taskItems.map((task, i) => (
-              <TaskListCard taskData={task} key={i} />
+              <TaskListCard
+                taskData={task}
+                key={i}
+                onChange={() => setRefetch(true)}
+              />
             ))}
           </div>
         )}
@@ -180,102 +169,6 @@ export default function MyTasksView({ match }) {
 
   return (
     <>
-      {showDetailsModal && (
-        <TaskDetailsView
-          task={task}
-          open={showDetailsModal}
-          onClose={() => {
-            setShowDetailsModal(false);
-          }}
-          onReview={() => {
-            setShowDetailsModal(false);
-            setShowReviewModal(true);
-          }}
-          onComplete={() => {
-            setShowDetailsModal(false);
-            setShowCompleteModal(true);
-          }}
-          onJobComplete={() => {
-            setShowDetailsModal(false);
-            setShowCompleteJobModal(true);
-          }}
-          onEdit={() => {
-            setShowDetailsModal(false);
-            setShowEditModal(true);
-          }}
-          onJobReview={(e, item) => {
-            setCompletionID(item);
-            setShowDetailsModal(false);
-            setShowJobReviewModal(true);
-          }}
-        />
-      )}
-      {showReviewModal && (
-        <ReviewTaskView
-          task={task}
-          open={showReviewModal}
-          onClose={(e, data) => {
-            setShowReviewModal(false);
-            setRefetch(true);
-            if (data) {
-              setTask(data);
-            }
-          }}
-        />
-      )}
-      {showCompleteModal && (
-        <CompleteTaskView
-          task={task}
-          open={showCompleteModal}
-          onClose={(e, data) => {
-            setShowCompleteModal(false);
-            setRefetch(true);
-            if (data) {
-              setTask(data);
-            }
-          }}
-        />
-      )}
-      {showCompleteJobModal && (
-        <CompleteJobView
-          task={task}
-          open={showCompleteJobModal}
-          onClose={(e, data) => {
-            setShowCompleteJobModal(false);
-            setRefetch(true);
-            if (data) {
-              setTask(data);
-            }
-          }}
-        />
-      )}
-      {showEditModal && (
-        <EditTaskView
-          task={task}
-          open={showEditModal}
-          onClose={(e, submit, data) => {
-            setShowEditModal(false);
-            setRefetch(true);
-            if (submit) {
-              setTask(data);
-            }
-          }}
-        />
-      )}
-      {showJobReviewModal && (
-        <ReviewJobView
-          task={task}
-          completionID={completionID}
-          open={showJobReviewModal}
-          onClose={(e, data) => {
-            setShowJobReviewModal(false);
-            setRefetch(true);
-            if (data) {
-              setTask(data);
-            }
-          }}
-        />
-      )}
       <MainLayout match={match}>
         <div className={styles.container}>
           <div style={{ width: "100%" }}>
