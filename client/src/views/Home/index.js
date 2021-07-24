@@ -6,20 +6,19 @@ import { fetchOpenTasks } from "../../api/tasksApi";
 import { createUseStyles } from "react-jss";
 import useOutsideAlerter, { taskTypes, Breakpoints } from "../../utils/utils";
 import TaskListCard from "../../components/TaskListCard";
+import NotificationItem from "../../components/NotificationItem";
+import { fetchNotifications } from "../../api/global";
+import { readAllNotifications } from "../../api/notificationsApi";
+import checkedIcon from "../Home/images/checked.svg";
 
 import caretDownIcon from "./images/caretDown.svg";
 import check from "./images/check.svg";
 import checked from "./images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
+import cx from "classnames";
 
 const useStyles = createUseStyles({
-  container: {
-    maxWidth: "100vw",
-    margin: "auto",
-    padding: "0 24px",
-    marginTop: "32px",
-    color: "#0B0F3B",
-  },
+  container: { maxWidth: "100vw", margin: "auto", padding: "0 24px" },
   searchInput: {
     border: "none",
     backgroundColor: "transparent",
@@ -32,11 +31,43 @@ const useStyles = createUseStyles({
       color: "rgba(255, 255, 255, 0.5)",
     },
   },
-  conceptsColumn: {
-    width: "256px",
-    marginRight: "50px",
-    flexShrink: 0,
-    boxSizing: "border-box",
+  mobileHeading: { display: "block", alignItems: "center" },
+  markAll: {
+    marginLeft: "0px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    color: "white",
+    fontSize: "12px",
+    marginTop: 0,
+  },
+  header: {
+    color: "rgba(255, 255, 255, 0.8)",
+    fontWeight: 600,
+    letterSpacing: "0.1em",
+    fontSize: "12px",
+    lineHeight: "15px",
+  },
+  notifBadge: {
+    backgroundColor: "#AD1D73",
+    borderRadius: "4px",
+    color: "white",
+    marginLeft: "6px",
+    marginRight: "10px",
+    minWidth: "15px",
+    minHeight: "17px",
+    userSelect: "none",
+    fontSize: "11px",
+    fontWeight: 600,
+    lineHeight: "13px",
+    padding: "4px",
+  },
+  leftColumn: { marginRight: "0px", flexShrink: 0, marginTop: "24px" },
+  [`@media (min-width: ${Breakpoints.sm}px)`]: {
+    container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
+
+    mobileHeading: { display: "flex", alignItems: "center" },
+    leftColumn: { marginRight: "150px", flexShrink: 0, marginTop: "0px" },
   },
   columnHeader: {
     fontWeight: 600,
@@ -104,25 +135,37 @@ const useStyles = createUseStyles({
     marginTop: "24px",
     width: "160px",
   },
-  [`@media (min-width: ${Breakpoints.sm}px)`]: {
-    container: {
-      maxWidth: "1050px",
-      margin: "auto",
-      padding: "0 88px",
-      marginTop: "32px",
-      color: "#0B0F3B",
-    },
-  },
+  // [`@media (min-width: ${Breakpoints.sm}px)`]: {
+  //   container: {
+  //     maxWidth: "1050px",
+  //     margin: "auto",
+  //     padding: "0 88px",
+  //     marginTop: "32px",
+  //     color: "#0B0F3B",
+  //   },
+  // },
 });
 
 export default function HomeView({ match }) {
   const [openTasks, setOpenTasks] = useState([]);
   const [searchTypes, setSearchTypes] = useState(["spec", "production", "qa"]);
+  const [notifications, setNotifications] = useState([])
   const [searchingTypes, setSearchingTypes] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState();
 
   const styles = useStyles();
+
+  const setAllRead = async () => {
+    setLoading(true);
+    await readAllNotifications();
+    fetchNotifications()
+      .then((data) => data.json())
+      .then((result) => {
+        setNotifications(result);
+        setLoading(false);
+      });
+  };
   const typeRef = useRef();
 
   useEffect(() => {
@@ -132,7 +175,11 @@ export default function HomeView({ match }) {
 
         const taskData = await fetchOpenTasks();
         setOpenTasks(taskData);
-
+        fetchNotifications()
+          .then((data) => data.json())
+          .then((result) => {
+            setNotifications(result)
+          });
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -169,17 +216,63 @@ export default function HomeView({ match }) {
     <MainLayout match={match}>
       <FadeIn>
         <div className={styles.container}>
-          <div style={{ display: "flex" }}>
+          <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '82px'}}>
+          <div className={styles.leftColumn}>
+          <>
+              <div className={cx(styles.header, styles.mobileHeading)}>
+                <div>
+                  NOTIFICATIONS{" "}
+                  {notifications.filter((notif) => !notif.isRead).length >
+                    0 && (
+                    <span className={styles.notifBadge}>
+                      {notifications.filter((notif) => !notif.isRead).length}
+                    </span>
+                  )}
+                </div>
+                {notifications.filter((notif) => !notif.isRead).length > 0 && (
+                  <div
+                    className={cx(styles.header, styles.markAll)}
+                    onClick={() => !loading && setAllRead()}
+                  >
+                    {loading ? (
+                      <div style={{ marginRight: "12px" }}>
+                        <CircularProgress
+                          style={{ color: "white" }}
+                          size={14}
+                        />
+                      </div>
+                    ) : (
+                      <img
+                        src={checkedIcon}
+                        alt="read"
+                        style={{
+                          marginRight: "8px",
+                          width: "14px",
+                          height: "14px",
+                        }}
+                      />
+                    )}
+                    Mark all notifications as read
+                  </div>
+                )}
+              </div>
+              <div style={{ marginTop: "32px" }}>
+                {notifications?.map((notification) => (
+                  <NotificationItem notification={notification} />
+                ))}
+              </div>
+            </>
+              </div>
             {
               <div
                 style={{
-                  width: "100%",
+                  width: "70%",
                 }}
               >
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                  <div className={styles.columnHeader}>OPEN TASKS</div>
+                  <div className={styles.header}>OPEN TASKS</div>
                   <div
                     className={styles.filterContainer}
                     onClick={() => setSearchingTypes(true)}
