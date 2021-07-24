@@ -62,7 +62,7 @@ const useStyles = createUseStyles({
     lineHeight: "13px",
     padding: "4px",
   },
-  leftColumn: { marginRight: "0px", flexShrink: 0, marginTop: "24px" },
+  leftColumn: { marginRight: "50px", flexShrink: 0, marginTop: "0px" },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
 

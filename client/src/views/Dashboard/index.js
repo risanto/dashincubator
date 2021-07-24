@@ -92,7 +92,7 @@ const useStyles = createUseStyles({
     padding: "8px",
     fontSize: "12px",
   },
-  leftColumn: { marginRight: "0px", flexShrink: 0, marginTop: "24px" },
+  leftColumn: { marginRight: "50px", flexShrink: 0, marginTop: "0px" },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
     markAll: {
