@@ -131,6 +131,7 @@ export default function MyTasksView({ match }) {
         console.log("Error in My Tasks ===>", error);
       }
     }
+
     if (
       !myTasksItems || // the first fetch when there's no data
       (myTasksItems && refetch) // another fetch when data is updated
