@@ -504,7 +504,7 @@ export default function TaskDetailsView({
 
                 <div
                   className={styles.commentCTA}
-                  onClick={() => !loading && onComment()}
+                  onClick={() => !loading && loggedInUser && onComment()}
                 >
                   {loading ? (
                     <div

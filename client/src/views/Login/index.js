@@ -13,6 +13,7 @@ import eyeOffIcon from "./images/eyeOff.svg";
 import { createUseStyles } from "react-jss";
 import { randomColor, usernameIsValid, Breakpoints } from "../../utils/utils";
 import warnIcon from "./images/warn.svg";
+import MainLayout from "../../layouts/MainLayout";
 
 export function validateEmail(email) {
   const re =
@@ -22,8 +23,7 @@ export function validateEmail(email) {
 
 const useStyles = createUseStyles({
   container: {
-    width: "100vw",
-    minHeight: "100vh",
+    width: "100%",
     overflow: "hidden",
     backgroundColor: "#008DE4",
   },
@@ -151,7 +151,7 @@ const useStyles = createUseStyles({
   },
 });
 
-export default function LoginView() {
+export default function LoginView({ match }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
@@ -241,102 +241,65 @@ export default function LoginView() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
-        <div>
-          <FadeIn>
-            <div className={styles.contentContainer}>
-              <div style={{ display: "flex", alignItems: "flex-end" }}>
-                <img
-                  src={dashLogo}
-                  alt="logo"
-                  style={{
-                    width: "112px",
-                  }}
-                />
-                <div className={styles.title}>INCUBATOR</div>
-              </div>
-              <div style={{ marginTop: "32px" }}>
-                <div className={styles.inputContainer}>
-                  {!loginState && (
-                    <div style={{ marginRight: "20px" }}>
-                      <div className={styles.inputHeader}>Email</div>
-                      <input
-                        className={styles.input}
-                        placeholder={"Enter email"}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                  )}
-                  <div className={styles.usernameInput}>
-                    <div className={styles.inputHeader}>
-                      {loginState ? "Username/Email" : "Username"}
-                    </div>
-                    <input
-                      className={styles.input}
-                      placeholder={
-                        loginState
-                          ? "Enter username or email"
-                          : "Enter username"
-                      }
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </div>
+    <MainLayout match={match}>
+      <div className={styles.container}>
+        <div className={styles.content}>
+          <div>
+            <FadeIn>
+              <div className={styles.contentContainer}>
+                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                  <img
+                    src={dashLogo}
+                    alt="logo"
+                    style={{
+                      width: "112px",
+                    }}
+                  />
+                  <div className={styles.title}>INCUBATOR</div>
                 </div>
-                <div className={styles.inputContainer}>
-                  <div style={{ marginRight: loginState ? 0 : "20px" }}>
-                    <div
-                      className={styles.inputHeader}
-                      style={{ marginTop: "20px" }}
-                    >
-                      Password
-                    </div>
-                    <div style={{ position: "relative" }}>
-                      <img
-                        src={showPassword ? eyeOffIcon : eyeIcon}
-                        alt="show"
-                        className={styles.showPassword}
-                        onClick={() => setShowPassword(!showPassword)}
-                      />
+                <div style={{ marginTop: "32px" }}>
+                  <div className={styles.inputContainer}>
+                    {!loginState && (
+                      <div style={{ marginRight: "20px" }}>
+                        <div className={styles.inputHeader}>Email</div>
+                        <input
+                          className={styles.input}
+                          placeholder={"Enter email"}
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </div>
+                    )}
+                    <div className={styles.usernameInput}>
+                      <div className={styles.inputHeader}>
+                        {loginState ? "Username/Email" : "Username"}
+                      </div>
                       <input
-                        style={{
-                          padding: "8px 16px",
-                          paddingRight: "32px",
-                        }}
                         className={styles.input}
-                        placeholder={"Enter password"}
-                        value={password}
-                        type={showPassword ? "text" : "password"}
-                        onKeyDown={(e) => {
-                          if (
-                            e.key === "Enter" &&
-                            loginState &&
-                            password &&
-                            username
-                          ) {
-                            onLogin();
-                          }
-                        }}
-                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder={
+                          loginState
+                            ? "Enter username or email"
+                            : "Enter username"
+                        }
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                       />
                     </div>
                   </div>
-                  {!loginState && (
-                    <div className={styles.usernameInput}>
+                  <div className={styles.inputContainer}>
+                    <div style={{ marginRight: loginState ? 0 : "20px" }}>
                       <div
                         className={styles.inputHeader}
                         style={{ marginTop: "20px" }}
                       >
-                        Verify Password
+                        Password
                       </div>
                       <div style={{ position: "relative" }}>
                         <img
-                          src={showPassword2 ? eyeOffIcon : eyeIcon}
+                          src={showPassword ? eyeOffIcon : eyeIcon}
                           alt="show"
                           className={styles.showPassword}
-                          onClick={() => setShowPassword2(!showPassword2)}
+                          onClick={() => setShowPassword(!showPassword)}
                         />
                         <input
                           style={{
@@ -344,165 +307,204 @@ export default function LoginView() {
                             paddingRight: "32px",
                           }}
                           className={styles.input}
-                          placeholder={"Enter password again"}
-                          value={password2}
+                          placeholder={"Enter password"}
+                          value={password}
+                          type={showPassword ? "text" : "password"}
                           onKeyDown={(e) => {
-                            if (e.key === "Enter" && !loginState) {
-                              if (!email) {
-                                setError("Enter an email address");
-                              } else if (!username) {
-                                setError("Enter a username");
-                              } else if (password.length === 0) {
-                                setError("Enter a password");
-                              } else if (password2.length === 0) {
-                                setError("Enter password verification");
-                              } else if (password !== password2) {
-                                setError("Passwords don't match");
-                              } else if (!validateEmail(email)) {
-                                setError("Invalid email");
-                              } else {
-                                onRegister();
-                              }
+                            if (
+                              e.key === "Enter" &&
+                              loginState &&
+                              password &&
+                              username
+                            ) {
+                              onLogin();
                             }
                           }}
-                          type={showPassword2 ? "text" : "password"}
-                          onChange={(e) => setPassword2(e.target.value)}
+                          onChange={(e) => setPassword(e.target.value)}
                         />
                       </div>
                     </div>
-                  )}
-                </div>
-                {loginState && (
-                  <div
-                    className={styles.forgotPassword}
-                    onClick={() => history.push(ResetPasswordLocation)}
-                  >
-                    FORGOT PASSWORD?
+                    {!loginState && (
+                      <div className={styles.usernameInput}>
+                        <div
+                          className={styles.inputHeader}
+                          style={{ marginTop: "20px" }}
+                        >
+                          Verify Password
+                        </div>
+                        <div style={{ position: "relative" }}>
+                          <img
+                            src={showPassword2 ? eyeOffIcon : eyeIcon}
+                            alt="show"
+                            className={styles.showPassword}
+                            onClick={() => setShowPassword2(!showPassword2)}
+                          />
+                          <input
+                            style={{
+                              padding: "8px 16px",
+                              paddingRight: "32px",
+                            }}
+                            className={styles.input}
+                            placeholder={"Enter password again"}
+                            value={password2}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !loginState) {
+                                if (!email) {
+                                  setError("Enter an email address");
+                                } else if (!username) {
+                                  setError("Enter a username");
+                                } else if (password.length === 0) {
+                                  setError("Enter a password");
+                                } else if (password2.length === 0) {
+                                  setError("Enter password verification");
+                                } else if (password !== password2) {
+                                  setError("Passwords don't match");
+                                } else if (!validateEmail(email)) {
+                                  setError("Invalid email");
+                                } else {
+                                  onRegister();
+                                }
+                              }
+                            }}
+                            type={showPassword2 ? "text" : "password"}
+                            onChange={(e) => setPassword2(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-                <div className={styles.CTAContainer}>
-                  {!loginState && (
-                    <div
-                      onClick={() => {
-                        resetData();
-                        setShowPassword(false);
-                        setShowPassword2(false);
-                        setLoginState(true);
-                      }}
-                      className={styles.optionCTA}
-                    >
-                      <img
-                        src={arrowRight}
-                        alt="arrow"
-                        style={{
-                          width: "14px",
-                          marginRight: "6px",
-                          transform: "rotate(180deg)",
-                        }}
-                      />
-                      <div className={styles.existingAccount}>
-                        I already have an account
-                      </div>
-                    </div>
-                  )}
-                  {loginState ? (
-                    <div
-                      className={styles.loginCTA}
-                      onClick={() => {
-                        if (!loading) {
-                          if (loginState && password && username) {
-                            onLogin();
-                          }
-                        }
-                      }}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          style={{ color: "white" }}
-                          size={14}
-                        />
-                      ) : (
-                        <div>Login</div>
-                      )}
-                    </div>
-                  ) : (
-                    <div
-                      className={styles.loginCTA}
-                      onClick={() => {
-                        if (!loading) {
-                          if (!email) {
-                            setError("Enter an email address");
-                          } else if (!username) {
-                            setError("Enter a username");
-                          } else if (password.length === 0) {
-                            setError("Enter a password");
-                          } else if (password2.length === 0) {
-                            setError("Enter password verification");
-                          } else if (password !== password2) {
-                            setError("Passwords don't match");
-                          } else if (!validateEmail(email)) {
-                            setError("Invalid email");
-                          } else {
-                            onRegister();
-                          }
-                        }
-                      }}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          style={{ color: "white" }}
-                          size={14}
-                        />
-                      ) : (
-                        <div>Create Account</div>
-                      )}
-                    </div>
-                  )}
                   {loginState && (
                     <div
-                      onClick={() => {
-                        resetData();
-                        setShowPassword(false);
-                        setShowPassword2(false);
-                        setLoginState(false);
-                      }}
-                      className={styles.optionCTA}
+                      className={styles.forgotPassword}
+                      onClick={() => history.push(ResetPasswordLocation)}
                     >
-                      <div>Create an account</div>
+                      FORGOT PASSWORD?
+                    </div>
+                  )}
+                  <div className={styles.CTAContainer}>
+                    {!loginState && (
+                      <div
+                        onClick={() => {
+                          resetData();
+                          setShowPassword(false);
+                          setShowPassword2(false);
+                          setLoginState(true);
+                        }}
+                        className={styles.optionCTA}
+                      >
+                        <img
+                          src={arrowRight}
+                          alt="arrow"
+                          style={{
+                            width: "14px",
+                            marginRight: "6px",
+                            transform: "rotate(180deg)",
+                          }}
+                        />
+                        <div className={styles.existingAccount}>
+                          I already have an account
+                        </div>
+                      </div>
+                    )}
+                    {loginState ? (
+                      <div
+                        className={styles.loginCTA}
+                        onClick={() => {
+                          if (!loading) {
+                            if (loginState && password && username) {
+                              onLogin();
+                            }
+                          }
+                        }}
+                      >
+                        {loading ? (
+                          <CircularProgress
+                            style={{ color: "white" }}
+                            size={14}
+                          />
+                        ) : (
+                          <div>Login</div>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        className={styles.loginCTA}
+                        onClick={() => {
+                          if (!loading) {
+                            if (!email) {
+                              setError("Enter an email address");
+                            } else if (!username) {
+                              setError("Enter a username");
+                            } else if (password.length === 0) {
+                              setError("Enter a password");
+                            } else if (password2.length === 0) {
+                              setError("Enter password verification");
+                            } else if (password !== password2) {
+                              setError("Passwords don't match");
+                            } else if (!validateEmail(email)) {
+                              setError("Invalid email");
+                            } else {
+                              onRegister();
+                            }
+                          }
+                        }}
+                      >
+                        {loading ? (
+                          <CircularProgress
+                            style={{ color: "white" }}
+                            size={14}
+                          />
+                        ) : (
+                          <div>Create Account</div>
+                        )}
+                      </div>
+                    )}
+                    {loginState && (
+                      <div
+                        onClick={() => {
+                          resetData();
+                          setShowPassword(false);
+                          setShowPassword2(false);
+                          setLoginState(false);
+                        }}
+                        className={styles.optionCTA}
+                      >
+                        <div>Create an account</div>
+                        <img
+                          src={arrowRight}
+                          alt="arrow"
+                          style={{ width: "14px", marginLeft: "6px" }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {error && (
+                    <div
+                      style={{
+                        marginTop: "24px",
+                        color: "white",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
                       <img
-                        src={arrowRight}
-                        alt="arrow"
-                        style={{ width: "14px", marginLeft: "6px" }}
+                        src={warnIcon}
+                        alt="error"
+                        style={{
+                          marginRight: "12px",
+                          width: "20px",
+                          height: "20px",
+                        }}
                       />
+                      <div>{error}</div>
                     </div>
                   )}
                 </div>
-                {error && (
-                  <div
-                    style={{
-                      marginTop: "24px",
-                      color: "white",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <img
-                      src={warnIcon}
-                      alt="error"
-                      style={{
-                        marginRight: "12px",
-                        width: "20px",
-                        height: "20px",
-                      }}
-                    />
-                    <div>{error}</div>
-                  </div>
-                )}
               </div>
-            </div>
-          </FadeIn>
+            </FadeIn>
+          </div>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }

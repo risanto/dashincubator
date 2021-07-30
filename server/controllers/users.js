@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { ObjectId, Binary } = require("mongodb");
 const { getTable } = require("../dal");
-const { authHandlers, signToken } = require("../handlers");
+const { noAuthHandlers, signToken } = require("../handlers");
 const crypto = require("crypto");
 const Schema = require("computed-types");
 
@@ -66,7 +66,7 @@ function generatePasswordHash(password, uid) {
 
 router.get(
   "/",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     usersCollection.find({}).toArray((err, users) => {
       res.send(users);
     });
@@ -75,7 +75,7 @@ router.get(
 
 router.get(
   "/simple",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     usersCollection
       .find({})
       .project({
@@ -93,7 +93,7 @@ router.get(
 
 router.get(
   "/admins",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     usersCollection
       .find({ isAdmin: true })
       .project({
@@ -110,7 +110,7 @@ router.get(
 
 router.get(
   "/admins/simple",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     usersCollection
       .find({ isAdmin: true })
       .project({
@@ -127,7 +127,7 @@ router.get(
 
 router.get(
   "/username/:username",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const bounties = await bountiesCollection
       .find({ "user.username": req.params.username })
       .toArray();
@@ -163,7 +163,7 @@ router.get(
 
 router.get(
   "/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     usersCollection
       .findOne({ _id: ObjectId(req.params.id) })
       .then((user) => res.send(user));
@@ -172,7 +172,7 @@ router.get(
 
 router.put(
   "/promote/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isSuperUser) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -189,7 +189,7 @@ router.put(
 
 router.put(
   "/demote/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isSuperUser) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -292,7 +292,7 @@ router.post("/update-password/:id", async (req, res) => {
 
 router.put(
   "/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const newData = { ...req.body };
     delete newData._id;
     let token = null;

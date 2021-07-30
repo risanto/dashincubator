@@ -1,21 +1,22 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { createUseStyles } from "react-jss";
 import MainLayout from "../../layouts/MainLayout";
-import searchIcon from "../Home/images/search.svg";
-import caretDown from "../Home/images/caretDown.svg";
+import searchIcon from "../Tasks/images/search.svg";
+import caretDown from "../Tasks/images/caretDown.svg";
 import { CircularProgress } from "@material-ui/core";
 import useOutsideAlerter, {
   conceptStatus,
   Breakpoints,
 } from "../../utils/utils";
 import { getAdminsSimple } from "../../api/usersApi";
-import check from "../Home/images/check.svg";
-import checked from "../Home/images/checked.svg";
+import check from "../Tasks/images/check.svg";
+import checked from "../Tasks/images/checked.svg";
 import { isMobile } from "react-device-detect";
 import {fetchAllConcepts} from "../../api/bountiesApi";
 import ConceptListItem from "../../components/ConceptListItem";
-import addIcon from "../Home/images/add.svg";
+import addIcon from "../Tasks/images/add.svg";
 import RequestNewConceptView from "../RequestNewConcept";
+import useGlobalState from "../../state";
 
 const useStyles = createUseStyles({
   container: {
@@ -132,6 +133,7 @@ export default function ConceptsView({ match }) {
   const [searchingCreators, setSearchingCreators] = useState(false);
   const [requestModal, setRequestModal] = useState(false);
   const [admins, setAdmins] = useState(null);
+  const { loggedInUser } = useGlobalState();
   const statusRef = useRef();
   const creatorRef = useRef();
 
@@ -199,25 +201,27 @@ export default function ConceptsView({ match }) {
       <div className={styles.container}>
         <div className={styles.header}>
           CONCEPTS
-
-          <div
-            className={styles.requestCTA}
-            onClick={handleRequestModal(true)}
-          >
+          {
+            loggedInUser &&
             <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-              }}
+              className={styles.requestCTA}
+              onClick={handleRequestModal(true)}
             >
-              <img
-                src={addIcon}
-                alt="add"
-                style={{ width: "16px", marginRight: "4px" }}
-              />
-              <div>Request New Concept</div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={addIcon}
+                  alt="add"
+                  style={{ width: "16px", marginRight: "4px" }}
+                />
+                <div>Request New Concept</div>
+              </div>
             </div>
-          </div>
+          }
         </div>
         <div className={styles.inputContainer}>
           <img src={searchIcon} alt="search" style={{ padding: "9px" }} />

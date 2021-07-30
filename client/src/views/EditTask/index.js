@@ -4,7 +4,7 @@ import { CircularProgress } from "@material-ui/core";
 import DashModal from "../../components/DashModal";
 import saveIcon from "../Concept/images/done.svg";
 import { fetchUsersSimple } from "../../api/usersApi";
-import addIcon from "../Home/images/add.svg";
+import addIcon from "../Tasks/images/add.svg";
 import specIcon from "./images/spec.svg";
 import productionIcon from "./images/production.svg";
 import qaIcon from "./images/qa.svg";

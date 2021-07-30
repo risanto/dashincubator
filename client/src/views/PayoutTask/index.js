@@ -135,7 +135,7 @@ export default function PayoutTaskView({ open, onClose, task }) {
                     Unpaid
                   </div>
                 )}
-                {loggedInUser.isSuperUser && !task.isPaid && (
+                {loggedInUser && loggedInUser.isSuperUser && !task.isPaid && (
                   <div
                     style={{
                       backgroundColor: "#008DE4",
