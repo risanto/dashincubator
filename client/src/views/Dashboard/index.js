@@ -11,16 +11,7 @@ import cx from "classnames";
 import MyTasksView from "../MyTasks";
 
 const useStyles = createUseStyles({
-  container: {
-    maxWidth: "100vw",
-    margin: "auto",
-    padding: "0 24px 88px 24px",
-    marginTop: "32px",
-    color: "#0B0F3B",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-  },
+  container: { maxWidth: "100vw", margin: "auto", padding: "0 24px" },
   markAll: {
     marginLeft: "0px",
     cursor: "pointer",
@@ -36,6 +27,7 @@ const useStyles = createUseStyles({
     borderRadius: "4px",
     color: "white",
     marginLeft: "6px",
+    marginRight: "10px",
     minWidth: "15px",
     minHeight: "17px",
     userSelect: "none",
@@ -88,17 +80,15 @@ const useStyles = createUseStyles({
     display: "flex",
   },
   rightColumn: {
+    width: '70%',
     display: "flex",
     flexDirection: "column",
     flex: 1,
   },
-  leftColumn: {
-    width: "30%",
-    margin: "0 16px 0 0",
-  },
-  [`@media (min-width: ${Breakpoints.lg}px)`]: {
+  leftColumn: { marginRight: "50px", flexShrink: 0, marginTop: "0px" },
+  [`@media (min-width: ${Breakpoints.sm}px)`]: {
+    container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
     markAll: {
-      marginLeft: "24px",
       cursor: "pointer",
       display: "flex",
       alignItems: "center",
@@ -107,14 +97,7 @@ const useStyles = createUseStyles({
       marginTop: 0,
     },
     mobileHeading: { display: "flex", alignItems: "center" },
-    rightColumn: { marginLeft: "24px", flexShrink: 0, marginTop: "0px" },
-    container: {
-      maxWidth: 1600,
-      margin: "auto",
-      padding: "0 88px 88px 88px",
-      marginTop: "32px",
-      color: "#0B0F3B",
-    },
+    leftColumn: { width: "30%", flexShrink: 0, marginTop: "0px" },
   },
 });
 
@@ -144,21 +127,19 @@ export default function DashboardView({ match }) {
   return (
     <MainLayout match={match}>
       <div className={styles.container}>
-        <div className={styles.mainContainer}>
+        <div style={{display: 'flex',  justifyContent: 'space-between', marginTop: '50px'}}>
           <div className={styles.leftColumn}>
-            {notifications?.length > 0 && (
-              <>
                 <div className={cx(styles.header, styles.mobileHeading)}>
                   <div>
                     NOTIFICATIONS{" "}
-                    {notifications.filter((notif) => !notif.isRead).length >
+                    {notifications && notifications.filter((notif) => !notif.isRead).length >
                     0 && (
                       <span className={styles.notifBadge}>
                         {notifications.filter((notif) => !notif.isRead).length}
                       </span>
                     )}
                   </div>
-                  {notifications.filter((notif) => !notif.isRead).length > 0 && (
+                  {notifications && notifications.filter((notif) => !notif.isRead).length > 0 && (
                     <div
                       className={cx(styles.header, styles.markAll)}
                       onClick={() => !loading && setAllRead()}
@@ -190,8 +171,6 @@ export default function DashboardView({ match }) {
                     <NotificationItem notification={notification} />
                   ))}
                 </div>
-              </>
-            )}
           </div>
           <div className={styles.rightColumn}>
             <MyTasksView match={match} />
