@@ -89,7 +89,6 @@ const useStyles = createUseStyles({
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
     markAll: {
-      marginRight: "150px",
       cursor: "pointer",
       display: "flex",
       alignItems: "center",
