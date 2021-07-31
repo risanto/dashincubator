@@ -80,11 +80,12 @@ const useStyles = createUseStyles({
     display: "flex",
   },
   rightColumn: {
+    width: '70%',
     display: "flex",
     flexDirection: "column",
     flex: 1,
   },
-  leftColumn: { marginRight: "50px", width: '30%', flexShrink: 0, marginTop: "0px" },
+  leftColumn: { marginRight: "50px", flexShrink: 0, marginTop: "0px" },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
     markAll: {
@@ -97,7 +98,7 @@ const useStyles = createUseStyles({
       marginTop: 0,
     },
     mobileHeading: { display: "flex", alignItems: "center" },
-    leftColumn: { marginRight: "150px", flexShrink: 0, marginTop: "0px" },
+    leftColumn: { width: "30%", flexShrink: 0, marginTop: "0px" },
   },
 });
 
