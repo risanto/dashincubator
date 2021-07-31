@@ -200,7 +200,7 @@ export default function TaskItem({ taskData, i, bounty, modifyTask }) {
             marginBottom: "6px",
           }}
         >
-          {formatTask(task, loggedInUser)}
+          {loggedInUser && formatTask(task, loggedInUser)}
         </div>
         <div
           style={{

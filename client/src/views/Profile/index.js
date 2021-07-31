@@ -126,7 +126,7 @@ export default function ProfileView({ match }) {
 
   return (
     <MainLayout match={match}>
-      {currentUser && (
+      {loggedInUser && currentUser && (
         <EditProfileView
           open={editProfile}
           onClose={() => setEditProfile(false)}
@@ -178,7 +178,7 @@ export default function ProfileView({ match }) {
                   </div>
                 </div>
                 <div>
-                  {loggedInUser.username === currentUser.username && (
+                  {loggedInUser && loggedInUser.username === currentUser.username && (
                     <div>
                       {loggedInUser.isSuperUser && (
                         <div

@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
+import clsx from "clsx";
 import { useHistory } from "react-router-dom";
 import {
-  ActivityLocation, BountiesLocation,
+  BountiesLocation,
   ConceptsLocation,
-  DashboardLocation,
   PaymentsLocation,
   ProfileLocation,
-  RootLocation,
+  RootLocation, TasksLocation,
 } from "../../Locations";
 import logoutIcon from "./images/logout.svg";
 import { removeAuthToken } from "../../api/serverRequest";
@@ -16,8 +16,6 @@ import dashLogo from "../../views/Login/images/dashLogo.svg";
 import checkboxIcon from "./images/checkbox.svg";
 import { createUseStyles } from "react-jss";
 import { Breakpoints } from "../../utils/utils";
-import timeIcon from "./images/time.svg";
-import notificationIcon from "./images/notification.svg";
 import UserAvatar from "../../components/UserAvatar";
 import { countNotifications } from "../../api/notificationsApi";
 import { fetchDashboardCount } from "../../api/global";
@@ -73,6 +71,26 @@ const useStyles = createUseStyles({
     fontWeight: 600,
     lineHeight: "13px",
     padding: "4px",
+  },
+  login: {
+    marginBottom: 4,
+    marginLeft: 16,
+  },
+  avatarWrapper: {
+    position: "relative",
+  },
+  notifications: {
+    position: "absolute",
+    right: -2,
+    top: -2,
+    backgroundColor: "#AD1D73",
+    fontSize: 8,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
@@ -141,6 +159,14 @@ export default function MainLayout({ children, style, match }) {
     history.push(BountiesLocation);
   }, [history]);
 
+  const handleTasks = useCallback(() => {
+    history.push(TasksLocation);
+  }, [history]);
+
+  const handleLogin = useCallback(() => {
+    history.push(RootLocation);
+  }, [history]);
+
   return (
     <div style={{ backgroundColor: "#008de4", minHeight: "100vh" }}>
       <DashModal open={showNav} onClose={() => setShowNav(false)}>
@@ -155,35 +181,35 @@ export default function MainLayout({ children, style, match }) {
             <img src={homeIcon} alt={"home"} style={{ width: "16px" }} />
             <div className={styles.navTitle}>Home</div>
           </div>
+          {/*<div*/}
+          {/*  className={styles.navItem}*/}
+          {/*  style={{ marginTop: "24px" }}*/}
+          {/*  onClick={() => {*/}
+          {/*    setShowNav(false);*/}
+          {/*    history.push(DashboardLocation);*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  <img*/}
+          {/*    src={notificationIcon}*/}
+          {/*    alt={"time"}*/}
+          {/*    style={{ width: "16px" }}*/}
+          {/*  />*/}
+          {/*  <div className={styles.navTitle}>Dashboard</div>*/}
+          {/*  {notifCount ? (*/}
+          {/*    <div className={styles.notifCount}>{notifCount}</div>*/}
+          {/*  ) : (*/}
+          {/*    <div style={{ opacity: 0 }} className={styles.notifCount}>*/}
+          {/*      0*/}
+          {/*    </div>*/}
+          {/*  )}*/}
+          {/*</div>*/}
           <div
             className={styles.navItem}
             style={{ marginTop: "24px" }}
-            onClick={() => {
-              setShowNav(false);
-              history.push(DashboardLocation);
-            }}
-          >
-            <img
-              src={notificationIcon}
-              alt={"time"}
-              style={{ width: "16px" }}
-            />
-            <div className={styles.navTitle}>Dashboard</div>
-            {notifCount ? (
-              <div className={styles.notifCount}>{notifCount}</div>
-            ) : (
-              <div style={{ opacity: 0 }} className={styles.notifCount}>
-                0
-              </div>
-            )}
-          </div>
-          <div
-            className={styles.navItem}
-            style={{ marginTop: "24px" }}
-            onClick={handleConcept}
+            onClick={handleTasks}
           >
             <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
-            <div className={styles.navTitle}>Concepts</div>
+            <div className={styles.navTitle}>Tasks</div>
           </div>
           <div
             className={styles.navItem}
@@ -196,14 +222,22 @@ export default function MainLayout({ children, style, match }) {
           <div
             className={styles.navItem}
             style={{ marginTop: "24px" }}
-            onClick={() => {
-              setShowNav(false);
-              history.push(ActivityLocation);
-            }}
+            onClick={handleConcept}
           >
-            <img src={timeIcon} alt={"time"} style={{ width: "16px" }} />
-            <div className={styles.navTitle}>Activity</div>
+            <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
+            <div className={styles.navTitle}>Concepts</div>
           </div>
+          {/*<div*/}
+          {/*  className={styles.navItem}*/}
+          {/*  style={{ marginTop: "24px" }}*/}
+          {/*  onClick={() => {*/}
+          {/*    setShowNav(false);*/}
+          {/*    history.push(ActivityLocation);*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  <img src={timeIcon} alt={"time"} style={{ width: "16px" }} />*/}
+          {/*  <div className={styles.navTitle}>Activity</div>*/}
+          {/*</div>*/}
           <div
             className={styles.navItem}
             style={{ marginTop: "24px" }}
@@ -244,6 +278,7 @@ export default function MainLayout({ children, style, match }) {
             }}
           >
             <UserAvatar
+              isProfile
               user={loggedInUser}
               size={"18px"}
               fontSize={"8px"}
@@ -275,43 +310,43 @@ export default function MainLayout({ children, style, match }) {
             onClick={() => setShowNav(!showNav)}
           />
           <div className={styles.navItemsContainer}>
-            <div
-              className={styles.navItem}
-              onClick={() => history.push(DashboardLocation)}
-              style={{
-                borderBottom:
-                  match?.path === DashboardLocation
-                    ? "4px solid #fff"
-                    : "4px solid transparent",
-              }}
-            >
-              <img
-                src={notificationIcon}
-                alt={"time"}
-                style={{ width: "16px" }}
-              />
-              <div className={styles.navTitle}>Dashboard</div>
-              {notifCount ? (
-                <div className={styles.notifCount}>{notifCount}</div>
-              ) : (
-                <div style={{ opacity: 0 }} className={styles.notifCount}>
-                  0
-                </div>
-              )}
-            </div>
+            {/*<div*/}
+            {/*  className={styles.navItem}*/}
+            {/*  onClick={() => history.push(DashboardLocation)}*/}
+            {/*  style={{*/}
+            {/*    borderBottom:*/}
+            {/*      match?.path === DashboardLocation*/}
+            {/*        ? "4px solid #fff"*/}
+            {/*        : "4px solid transparent",*/}
+            {/*  }}*/}
+            {/*>*/}
+            {/*  <img*/}
+            {/*    src={notificationIcon}*/}
+            {/*    alt={"time"}*/}
+            {/*    style={{ width: "16px" }}*/}
+            {/*  />*/}
+            {/*  <div className={styles.navTitle}>Dashboard</div>*/}
+            {/*  {notifCount ? (*/}
+            {/*    <div className={styles.notifCount}>{notifCount}</div>*/}
+            {/*  ) : (*/}
+            {/*    <div style={{ opacity: 0 }} className={styles.notifCount}>*/}
+            {/*      0*/}
+            {/*    </div>*/}
+            {/*  )}*/}
+            {/*</div>*/}
             <div
               className={styles.navItem}
               style={{
                 marginLeft: "16px",
                 borderBottom:
-                  match?.path === ConceptsLocation
+                  match?.path === TasksLocation
                     ? "4px solid #fff"
                     : "4px solid transparent",
               }}
-              onClick={handleConcept}
+              onClick={handleTasks}
             >
               <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
-              <div className={styles.navTitle}>Concepts</div>
+              <div className={styles.navTitle}>Tasks</div>
             </div>
             <div
               className={styles.navItem}
@@ -332,15 +367,29 @@ export default function MainLayout({ children, style, match }) {
               style={{
                 marginLeft: "16px",
                 borderBottom:
-                  match?.path === ActivityLocation
+                  match?.path === ConceptsLocation
                     ? "4px solid #fff"
                     : "4px solid transparent",
               }}
-              onClick={() => history.push(ActivityLocation)}
+              onClick={handleConcept}
             >
-              <img src={timeIcon} alt={"time"} style={{ width: "16px" }} />
-              <div className={styles.navTitle}>Activity</div>
+              <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
+              <div className={styles.navTitle}>Concepts</div>
             </div>
+            {/*<div*/}
+            {/*  className={styles.navItem}*/}
+            {/*  style={{*/}
+            {/*    marginLeft: "16px",*/}
+            {/*    borderBottom:*/}
+            {/*      match?.path === ActivityLocation*/}
+            {/*        ? "4px solid #fff"*/}
+            {/*        : "4px solid transparent",*/}
+            {/*  }}*/}
+            {/*  onClick={() => history.push(ActivityLocation)}*/}
+            {/*>*/}
+            {/*  <img src={timeIcon} alt={"time"} style={{ width: "16px" }} />*/}
+            {/*  <div className={styles.navTitle}>Activity</div>*/}
+            {/*</div>*/}
             <div
               className={styles.navItem}
               style={{
@@ -355,20 +404,32 @@ export default function MainLayout({ children, style, match }) {
               <img src={checkboxIcon} alt={"check"} style={{ width: "16px" }} />
               <div className={styles.navTitle}>Rewards</div>
             </div>
-            <Tooltip title="Logout">
-              <img
-                onClick={() => onLogout()}
-                src={logoutIcon}
-                alt={"time"}
-                style={{
-                  width: "16px",
-                  margin: "0px 16px",
-                  cursor: "pointer",
-                  userSelect: "none",
-                }}
-              />
-            </Tooltip>
-            <UserAvatar user={loggedInUser} />
+            {
+              loggedInUser &&
+              <Tooltip title="Logout">
+                <img
+                  onClick={() => onLogout()}
+                  src={logoutIcon}
+                  alt={"time"}
+                  style={{
+                    width: "16px",
+                    margin: "0px 16px",
+                    cursor: "pointer",
+                    userSelect: "none",
+                  }}
+                />
+              </Tooltip>
+            }
+            <div className={styles.avatarWrapper}>
+              <UserAvatar user={loggedInUser} isProfile />
+              {
+                notifCount ? <div className={styles.notifications}>{notifCount}</div> : null
+              }
+            </div>
+            {
+              !loggedInUser &&
+              <div className={clsx(styles.navItem, styles.login)} onClick={handleLogin}>Login | Signup</div>
+            }
           </div>
         </div>
       </div>

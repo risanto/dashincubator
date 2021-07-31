@@ -254,7 +254,7 @@ export default function ConceptView({ match }) {
               </div>
             </div>
             <div className={styles.card} style={{ marginTop: "24px" }}>
-              {loggedInUser.isAdmin &&
+              {loggedInUser && loggedInUser.isAdmin &&
                 concept.user.username !== loggedInUser.username && (
                   <Button
                     style={{
@@ -285,7 +285,7 @@ export default function ConceptView({ match }) {
                     <div>Approve Concept</div>
                   </Button>
                 )}
-              {loggedInUser.username === concept.user.username && (
+              {loggedInUser && loggedInUser.username === concept.user.username && (
                 <Button
                   style={{
                     fontWeight: 600,
@@ -387,10 +387,11 @@ export default function ConceptView({ match }) {
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         loading={loading}
+                        readOnly={!loggedInUser}
                       />
                       <div
                         className={styles.commentCTA}
-                        onClick={() => !loading && onComment()}
+                        onClick={() => !loading && loggedInUser && onComment()}
                       >
                         {loading ? (
                           <div

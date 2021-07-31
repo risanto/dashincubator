@@ -694,7 +694,7 @@ export default function BountyView({ match }) {
                         />
                         <div
                           className={styles.commentCTA}
-                          onClick={() => !loading && onComment()}
+                          onClick={() => !loading && loggedInUser && onComment()}
                         >
                           {loading ? (
                             <div

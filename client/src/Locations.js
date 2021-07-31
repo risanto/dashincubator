@@ -3,6 +3,8 @@ export const RootLocation = "/";
 export const LoginLocation = "/login";
 export const RegisterLocation = "/register";
 
+export const TasksLocation = "/tasks";
+
 export const ConceptsLocation = "/concepts";
 
 export const RequestNewConceptLocation = "/request-new-concept";
@@ -32,6 +34,8 @@ export const ProfileLocation = (username) => `/user/${username}`;
 export const ActivityLocation = "/activity";
 
 export const DashboardLocation = "/dashboard";
+
+export const MyTasksLocation = "/my-tasks";
 
 export const UserManagementLocation = "/user-management";
 

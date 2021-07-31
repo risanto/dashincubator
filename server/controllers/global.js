@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { ObjectID } = require("mongodb");
 const { getTable } = require("../dal");
-const { authHandlers } = require("../handlers");
+const { noAuthHandlers } = require("../handlers");
 
 const router = Router();
 const activityCollection = getTable("activity");
@@ -11,7 +11,7 @@ const notificationsCollection = getTable("notifications");
 
 router.get(
   "/activity",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await activityCollection.find({}).toArray();
     res.send(result.sort((a, b) => new Date(b.date) - new Date(a.date)));
   })
@@ -19,7 +19,7 @@ router.get(
 
 router.get(
   "/notifications",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await notificationsCollection
       .find({
         $or: [
@@ -34,7 +34,7 @@ router.get(
 
 router.get(
   "/dashboard",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const unpaidTasks = await tasksCollection
       .find({ status: "complete", isPaid: { $exists: false } })
       .toArray();
@@ -108,7 +108,7 @@ router.get(
 
 router.get(
   "/dashboard-count",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const unpaidTasks = await tasksCollection
       .find({ status: "complete", isPaid: { $exists: false } })
       .count();

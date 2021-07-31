@@ -1,14 +1,14 @@
 const { Router } = require("express");
 const { ObjectID } = require("mongodb");
 const { getTable } = require("../dal");
-const { authHandlers } = require("../handlers");
+const { noAuthHandlers } = require("../handlers");
 
 const router = Router();
 const notificationsCollection = getTable("notifications");
 
 router.put(
   "/set-read/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     await notificationsCollection.findOneAndUpdate(
       { _id: ObjectID(req.params.id) },
       { $set: { isRead: true } }
@@ -19,7 +19,7 @@ router.put(
 
 router.put(
   "/set-read-all",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     await notificationsCollection.updateMany(
       {
         $or: [
@@ -35,7 +35,7 @@ router.put(
 
 router.get(
   "/count",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const notifs = await notificationsCollection
       .find({
         isRead: { $exists: false },

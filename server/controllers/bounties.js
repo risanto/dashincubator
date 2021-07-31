@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { ObjectID, ObjectId } = require("mongodb");
 const { getTable } = require("../dal");
-const { authHandlers } = require("../handlers");
+const { noAuthHandlers } = require("../handlers");
 
 const router = Router();
 const bountiesCollection = getTable("bounties");
@@ -12,7 +12,7 @@ const notificationsCollection = getTable("notifications");
 
 router.get(
   "/",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     bountiesCollection.aggregate([
       { $match: { type: "bounty" } },
       {
@@ -52,7 +52,7 @@ router.get(
 
 router.put(
   "/comment/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const commentID = new ObjectID();
 
     const bounty = await bountiesCollection.findOne({
@@ -107,7 +107,7 @@ router.put(
 
 router.put(
   "/comment-edit/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     await notificationsCollection.updateMany(
       { commentID: ObjectId(req.params.id) },
       { $set: { comment: req.body.comment } }
@@ -122,7 +122,7 @@ router.put(
 
 router.get(
   "/get/:id/activity",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await activityCollection
       .find({
         $or: [
@@ -137,7 +137,7 @@ router.get(
 
 router.put(
   "/comment/:id/last-seen",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     // Read out comments
     try {
       await activityCollection.updateMany(
@@ -159,7 +159,7 @@ router.put(
 
 router.get(
   "/concepts/public",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     bountiesCollection
       .find({ type: "concept", status: "review" })
       .project({ user: 1, title: 1, displayURL: 1, dateCreated: 1 })
@@ -175,7 +175,7 @@ router.get(
 
 router.get(
   "/concepts/all",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     bountiesCollection
       .aggregate([
         { $match: { type: "concept" } },
@@ -218,7 +218,7 @@ router.get(
 
 router.get(
   "/bounty/:url",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const bounty = await bountiesCollection.findOne({
       displayURL: req.params.url,
     });
@@ -236,7 +236,7 @@ router.get(
 
 router.post(
   "/new",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const bounty = await bountiesCollection.insertOne({ ...req.body });
     res.send({ message: "success" });
     await activityCollection.insertOne({
@@ -253,7 +253,7 @@ router.post(
 
 router.put(
   "/update",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.status(403).send({ error: "Insufficient permissions" });
     } else {

@@ -8,7 +8,7 @@ import MainLayout from "../../layouts/MainLayout";
 import { RootLocation } from "../../Locations";
 import useGlobalState from "../../state";
 import { Breakpoints } from "../../utils/utils";
-import searchIcon from "../Home/images/search.svg";
+import searchIcon from "../Tasks/images/search.svg";
 
 const useStyles = createUseStyles({
   container: {

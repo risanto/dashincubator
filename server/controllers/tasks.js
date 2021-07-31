@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { ObjectId, ObjectID } = require("mongodb");
 const { getTable } = require("../dal");
-const { authHandlers } = require("../handlers");
+const { noAuthHandlers, authHandlers } = require("../handlers");
 
 const router = Router();
 const tasksCollection = getTable("tasks");
@@ -12,7 +12,7 @@ const notificationsCollection = getTable("notifications");
 
 router.get(
   "/get/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await tasksCollection.findOne({
       _id: ObjectID(req.params.id),
     });
@@ -22,7 +22,7 @@ router.get(
 
 router.get(
   "/get/:id/activity",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await activityCollection
       .find({
         taskID: ObjectID(req.params.id),
@@ -33,9 +33,10 @@ router.get(
   })
 );
 
+// Open Tasks data is used on the home page (spec 7.1.1)
 router.get(
   "/open",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const result = await tasksCollection
       .aggregate([
         {
@@ -43,6 +44,7 @@ router.get(
             status: "open",
           },
         },
+        // Look for comments based on taskID
         {
           $lookup: {
             from: "activity",
@@ -65,9 +67,111 @@ router.get(
   })
 );
 
+// Data used on My Tasks list (spec 7.1.3)
+router.get(
+  "/current",
+  ...authHandlers(async (req, res) => {
+    // 1. Tasks you’re working on -> Tasks the user has been assigned but not created a Claim for yet
+    const workingOn = await tasksCollection
+      .find({
+        status: "open",
+        "assignee._id": {
+          $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
+        },
+      })
+      .toArray();
+
+    // 2. Pending Claims -> Claims the user has made (on Tasks they want to claim)
+    const pendingClaims = await tasksCollection
+      .find({
+        status: { $in: ["pending", "modify"] },
+        "assignee._id": {
+          $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
+        },
+        "completions.completionUser._id": {
+          $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
+        },
+      })
+      .toArray();
+
+    // 3. Pending Bids -> Bids the user has made (on Tasks they want to reserve)
+    const pendingBids = await tasksCollection
+      .find({
+        status: "open",
+        "requests._id": {
+          $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
+        },
+      })
+      .toArray();
+
+    // 4. Claims to Process -> Claims on Tasks the user is the Admin owner of (on uncompleted Tasks)
+    const claimsToProcess =
+      req.tokenPayload.isAdmin &&
+      (await tasksCollection
+        .find({
+          status: { $in: ["pending", "modify"] },
+          "createdBy._id": {
+            $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
+          },
+          completions: { $exists: true, $not: { $size: 0 } },
+        })
+        .toArray());
+
+    // 5. Bids to Process -> Bids on Tasks the user is the Admin owner of
+    const bidsToProcess =
+      req.tokenPayload.isAdmin &&
+      (await tasksCollection
+        .find({
+          status: "open",
+          "createdBy._id": {
+            $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
+          },
+          requests: { $exists: true, $not: { $size: 0 } },
+          assignee: null
+        })
+        .toArray());
+
+    // 6. Tasks you’re managing -> Tasks the Admin user owns that are in progress
+    const managing =
+      req.tokenPayload.isAdmin &&
+      (await tasksCollection
+        .find({
+          status: "open",
+          "createdBy._id": {
+            $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
+          },
+          assignee: { $gt: {} },
+        })
+        .toArray());
+
+    // 7. Tasks to pay -> Completed Tasks from all users that are unpaid
+    const tasksToPay =
+      req.tokenPayload.isSuperUser &&
+      (await tasksCollection
+        .find({
+          status: "complete",
+          approvedAdmin: { $gt: {} },
+          isPaid: { $ne: true },
+        })
+        .toArray());
+
+    let result = { workingOn, pendingClaims, pendingBids };
+
+    if (req.tokenPayload.isAdmin || req.tokenPayload.isSuperUser) {
+      result = { ...result, claimsToProcess, bidsToProcess, managing };
+    }
+
+    if (req.tokenPayload.isSuperUser) {
+      result = { ...result, tasksToPay };
+    }
+
+    res.send(result);
+  })
+);
+
 router.get(
   "/completed",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     let jobItems = [];
     const jobs = await tasksCollection
       .find({
@@ -119,7 +223,7 @@ router.get(
 
 router.post(
   "/new",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -174,7 +278,7 @@ router.post(
 
 router.put(
   "/update",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -225,7 +329,7 @@ router.put(
 
 router.put(
   "/request-to-reserve/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const task = await tasksCollection.findOneAndUpdate(
       { _id: ObjectID(req.params.id) },
       { $push: { requests: req.body } },
@@ -263,7 +367,7 @@ router.put(
 
 router.put(
   "/request-to-modify/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -310,7 +414,7 @@ router.put(
 
 router.put(
   "/request-to-approve/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -363,7 +467,7 @@ router.put(
 
 router.put(
   "/request-to-approve-job/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isAdmin) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -416,7 +520,7 @@ router.put(
 
 router.put(
   "/payout-concept/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isSuperUser) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -469,7 +573,7 @@ router.put(
 
 router.put(
   "/payout/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     if (!req.tokenPayload.isSuperUser) {
       res.send({ error: "Insufficient permissions" });
     } else {
@@ -617,7 +721,7 @@ router.put(
 
 router.put(
   "/comment/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const commentID = new ObjectID();
 
     const task = await tasksCollection.findOne({
@@ -676,7 +780,7 @@ router.put(
 
 router.put(
   "/comment-edit/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     await notificationsCollection.updateMany(
       { commentID: ObjectId(req.params.id) },
       { $set: { comment: req.body.comment } }
@@ -691,7 +795,7 @@ router.put(
 
 router.put(
   "/request-to-complete/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const completionID = new ObjectID();
     const origTask = await tasksCollection.findOne({
       _id: ObjectID(req.params.id),
@@ -750,7 +854,7 @@ router.put(
 
 router.put(
   "/request-to-complete-job/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     const completionID = new ObjectID();
     const task = await tasksCollection.findOneAndUpdate(
       { _id: ObjectID(req.params.id) },
@@ -801,7 +905,7 @@ router.put(
 
 router.put(
   "/activity-viewed/:id",
-  ...authHandlers(async (req, res) => {
+  ...noAuthHandlers(async (req, res) => {
     // add username with time of view
     const newKey = `lastView.${req.tokenPayload.username}`;
 
@@ -812,6 +916,5 @@ router.put(
     res.send({ message: "success" });
   })
 );
-
 
 module.exports = router;

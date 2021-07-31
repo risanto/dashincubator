@@ -93,7 +93,7 @@ const useStyles = createUseStyles({
   },
 });
 
-export default function TaskListCard({ taskData }) {
+export default function TaskListCard({ taskData, onChange }) {
   const { loggedInUser } = useGlobalState();
   const styles = useStyles();
   const history = useHistory();
@@ -169,6 +169,7 @@ export default function TaskListCard({ taskData }) {
           onClose={(e, data) => {
             setShowReviewModal(false);
             if (data) {
+              onChange();
               setTask(data);
             }
           }}
@@ -181,6 +182,7 @@ export default function TaskListCard({ taskData }) {
           onClose={(e, data) => {
             setShowCompleteModal(false);
             if (data) {
+              onChange();
               setTask(data);
             }
           }}
@@ -193,6 +195,7 @@ export default function TaskListCard({ taskData }) {
           onClose={(e, data) => {
             setShowCompleteJobModal(false);
             if (data) {
+              onChange();
               setTask(data);
             }
           }}
@@ -205,6 +208,7 @@ export default function TaskListCard({ taskData }) {
           onClose={(e, submit, data) => {
             setShowEditModal(false);
             if (submit) {
+              onChange();
               setTask(data);
             }
           }}
@@ -218,6 +222,7 @@ export default function TaskListCard({ taskData }) {
           onClose={(e, data) => {
             setShowJobReviewModal(false);
             if (data) {
+              onChange();
               setTask(data);
             }
           }}

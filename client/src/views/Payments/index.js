@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import MainLayout from "../../layouts/MainLayout";
-import searchIcon from "../Home/images/search.svg";
-import caretDown from "../Home/images/caretDown.svg";
+import searchIcon from "../Tasks/images/search.svg";
+import caretDown from "../Tasks/images/caretDown.svg";
 import { getCompletedTasks } from "../../api/tasksApi";
 import { CircularProgress } from "@material-ui/core";
 import useOutsideAlerter, {
@@ -14,8 +14,8 @@ import moment from "moment";
 import UserAvatar from "../../components/UserAvatar";
 import PayoutTaskView from "../PayoutTask";
 import { getAdminsSimple } from "../../api/usersApi";
-import check from "../Home/images/check.svg";
-import checked from "../Home/images/checked.svg";
+import check from "../Tasks/images/check.svg";
+import checked from "../Tasks/images/checked.svg";
 import { isMobile } from "react-device-detect";
 
 const getHighlightedText = (text, highlight) => {

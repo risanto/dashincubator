@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import { useHistory } from "react-router";
-import checkIcon from "../views/Home/images/check.svg";
-import checkedIcon from "../views/Home/images/checked.svg";
+import checkIcon from "../views/Tasks/images/check.svg";
+import checkedIcon from "../views/Tasks/images/checked.svg";
 import { renderToString } from "react-dom/server";
 import { BountyLocation, ProfileLocation } from "../Locations";
 import moment from "moment";
