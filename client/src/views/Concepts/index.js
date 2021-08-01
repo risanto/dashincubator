@@ -30,7 +30,7 @@ const useStyles = createUseStyles({
     padding: "0 24px",
     marginTop: "32px",
     color: "#0B0F3B",
-    paddingBottom: "64px",
+    paddingBottom: "24px",
   },
   header: {
     color: "rgba(255, 255, 255, 0.8)",
@@ -119,10 +119,9 @@ const useStyles = createUseStyles({
     container: {
       maxWidth: "1050px",
       margin: "auto",
-      padding: "0 88px",
+      padding: "0 88px 24px 88px",
       marginTop: "32px",
-      color: "#0B0F3B",
-      paddingBottom: "64px",
+      color: "#0B0F3B"
     },
   },
 });

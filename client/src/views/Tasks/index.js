@@ -109,7 +109,7 @@ const useStyles = createUseStyles({
     container: {
       maxWidth: "1050px",
       margin: "auto",
-      padding: "0 88px",
+      padding: "0 88px 24px 88px",
       marginTop: "32px",
       color: "#0B0F3B",
     },

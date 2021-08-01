@@ -246,14 +246,14 @@ const useStyles = createUseStyles({
     container: {
       maxWidth: 1600,
       margin: "auto",
-      padding: "0 88px",
+      padding: "0 88px 24px 88px",
       marginTop: 32,
       color: "#0B0F3B",
     },
   },
   [`@media (max-width: ${Breakpoints.sm}px)`]: {
     container: {
-      padding: "0 12px",
+      padding: "0 24px 12px 24px",
     },
     searchContainer: {
       backgroundColor: "rgb(0, 0, 0, 0.3)",
