@@ -176,8 +176,8 @@ export default function DashboardView({ match }) {
                 )}
             </div>
             <div style={{ marginTop: "32px" }}>
-              {notifications?.map((notification) => (
-                <NotificationItem notification={notification} />
+              {notifications?.map((notification, idx) => (
+                <NotificationItem key={idx} notification={notification} />
               ))}
             </div>
           </div>
