@@ -12,6 +12,7 @@ const defaultValue = {};
 
 const BreakpointContext = createContext(defaultValue);
 
+// Can be used later for cases when different components are used on different breakpoints
 const BreakpointProvider = ({ children, queries }) => {
   const [queryMatch, setQueryMatch] = useState({});
 
