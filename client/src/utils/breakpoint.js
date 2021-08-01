@@ -3,8 +3,9 @@ import React, { useState, useEffect, createContext, useContext } from "react";
 const Breakpoints = {
   xs: 414,
   sm: 768,
-  md: 1366,
-  lg: 1920,
+  md: 1024,
+  lg: 1366,
+  xl: 1920,
 };
 
 const defaultValue = {};

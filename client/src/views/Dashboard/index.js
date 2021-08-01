@@ -9,10 +9,10 @@ import { readAllNotifications } from "../../api/notificationsApi";
 
 import cx from "classnames";
 import MyTasksView from "../MyTasks";
-import { Breakpoints, useBreakpoint } from "../../utils/breakpoint";
+import { Breakpoints } from "../../utils/breakpoint";
 
 const useStyles = createUseStyles({
-  container: { maxWidth: "100vw", margin: "auto", padding: "0 24px" },
+  container: { maxWidth: "100vw", margin: "auto", padding: "24px" },
   markAll: {
     marginLeft: "0px",
     cursor: "pointer",
@@ -80,15 +80,14 @@ const useStyles = createUseStyles({
     width: "100%",
     display: "flex",
   },
-  rightColumn: {
-    width: "70%",
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-  },
-  leftColumn: { marginRight: "50px", flexShrink: 0, marginTop: "0px" },
-  [`@media (min-width: ${Breakpoints.sm}px)`]: {
-    container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
+  notificationColumn: { marginRight: 0 },
+  myTasksColumn: { width: "100%", marginTop: "1rem" },
+  [`@media (min-width: ${Breakpoints.xs}px)`]: {
+    mobileHeading: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
     markAll: {
       cursor: "pointer",
       display: "flex",
@@ -97,15 +96,28 @@ const useStyles = createUseStyles({
       fontSize: "12px",
       marginTop: 0,
     },
-    mobileHeading: { display: "flex", alignItems: "center" },
-    leftColumn: { width: "30%", flexShrink: 0, marginTop: "0px" },
+  },
+  [`@media (min-width: ${Breakpoints.sm}px)`]: {
+    container: {
+      maxWidth: 1600,
+      margin: "auto",
+      padding: "24px 88px",
+    },
+  },
+  [`@media (min-width: ${Breakpoints.md}px)`]: {
+    container: { display: "flex" },
+    myTasksColumn: { marginTop: 0 },
+    notificationColumn: {
+      marginRight: "50px",
+      flexShrink: 0,
+      marginTop: "0px",
+    },
   },
 });
 
 export default function DashboardView({ match }) {
   const [notifications, setNotifications] = useState(null);
   const [loading, setLoading] = useState(false);
-  const breakpoints = useBreakpoint();
 
   const styles = useStyles();
 
@@ -129,61 +141,50 @@ export default function DashboardView({ match }) {
   return (
     <MainLayout match={match}>
       <div className={styles.container}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: "50px",
-          }}
-        >
-          <div className={styles.leftColumn}>
-            <div className={cx(styles.header, styles.mobileHeading)}>
-              <div>
-                NOTIFICATIONS{" "}
-                {notifications &&
-                  notifications.filter((notif) => !notif.isRead).length > 0 && (
-                    <span className={styles.notifBadge}>
-                      {notifications.filter((notif) => !notif.isRead).length}
-                    </span>
-                  )}
-              </div>
+        <div className={styles.notificationColumn}>
+          <div className={cx(styles.header, styles.mobileHeading)}>
+            <div>
+              NOTIFICATIONS{" "}
               {notifications &&
                 notifications.filter((notif) => !notif.isRead).length > 0 && (
-                  <div
-                    className={cx(styles.header, styles.markAll)}
-                    onClick={() => !loading && setAllRead()}
-                  >
-                    {loading ? (
-                      <div style={{ marginRight: "12px" }}>
-                        <CircularProgress
-                          style={{ color: "white" }}
-                          size={14}
-                        />
-                      </div>
-                    ) : (
-                      <img
-                        src={checkedIcon}
-                        alt="read"
-                        style={{
-                          marginRight: "8px",
-                          width: "14px",
-                          height: "14px",
-                        }}
-                      />
-                    )}
-                    Mark all notifications as read
-                  </div>
+                  <span className={styles.notifBadge}>
+                    {notifications.filter((notif) => !notif.isRead).length}
+                  </span>
                 )}
             </div>
-            <div style={{ marginTop: "32px" }}>
-              {notifications?.map((notification, idx) => (
-                <NotificationItem key={idx} notification={notification} />
-              ))}
-            </div>
+            {notifications &&
+              notifications.filter((notif) => !notif.isRead).length > 0 && (
+                <div
+                  className={cx(styles.header, styles.markAll)}
+                  onClick={() => !loading && setAllRead()}
+                >
+                  {loading ? (
+                    <div style={{ marginRight: "12px" }}>
+                      <CircularProgress style={{ color: "white" }} size={14} />
+                    </div>
+                  ) : (
+                    <img
+                      src={checkedIcon}
+                      alt="read"
+                      style={{
+                        marginRight: "8px",
+                        width: "14px",
+                        height: "14px",
+                      }}
+                    />
+                  )}
+                  Mark all as read
+                </div>
+              )}
           </div>
-          <div className={styles.rightColumn}>
-            <MyTasksView match={match} />
+          <div style={{ marginTop: "32px" }}>
+            {notifications?.map((notification, idx) => (
+              <NotificationItem key={idx} notification={notification} />
+            ))}
           </div>
+        </div>
+        <div className={styles.myTasksColumn}>
+          <MyTasksView match={match} />
         </div>
       </div>
     </MainLayout>

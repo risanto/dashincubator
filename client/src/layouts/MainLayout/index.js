@@ -97,7 +97,7 @@ const useStyles = createUseStyles({
     alignItems: "center",
     justifyContent: "center",
   },
-  [`@media (min-width: ${Breakpoints.sm}px)`]: {
+  [`@media (min-width: ${Breakpoints.md}px)`]: {
     container: { maxWidth: 1600, margin: "auto", padding: "0 88px" },
     logoText: {
       display: "block",
