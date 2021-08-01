@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import MainLayout from "../../layouts/MainLayout";
 import { fetchNotifications } from "../../api/global";
@@ -6,9 +6,10 @@ import NotificationItem from "../../components/NotificationItem";
 import checkedIcon from "../Tasks/images/checked.svg";
 import { CircularProgress } from "@material-ui/core";
 import { readAllNotifications } from "../../api/notificationsApi";
-import { Breakpoints } from "../../utils/utils";
+
 import cx from "classnames";
 import MyTasksView from "../MyTasks";
+import { Breakpoints, useBreakpoint } from "../../utils/breakpoint";
 
 const useStyles = createUseStyles({
   container: { maxWidth: "100vw", margin: "auto", padding: "0 24px" },
@@ -80,7 +81,7 @@ const useStyles = createUseStyles({
     display: "flex",
   },
   rightColumn: {
-    width: '70%',
+    width: "70%",
     display: "flex",
     flexDirection: "column",
     flex: 1,
@@ -104,6 +105,7 @@ const useStyles = createUseStyles({
 export default function DashboardView({ match }) {
   const [notifications, setNotifications] = useState(null);
   const [loading, setLoading] = useState(false);
+  const breakpoints = useBreakpoint();
 
   const styles = useStyles();
 
@@ -127,50 +129,57 @@ export default function DashboardView({ match }) {
   return (
     <MainLayout match={match}>
       <div className={styles.container}>
-        <div style={{display: 'flex',  justifyContent: 'space-between', marginTop: '50px'}}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "50px",
+          }}
+        >
           <div className={styles.leftColumn}>
-                <div className={cx(styles.header, styles.mobileHeading)}>
-                  <div>
-                    NOTIFICATIONS{" "}
-                    {notifications && notifications.filter((notif) => !notif.isRead).length >
-                    0 && (
-                      <span className={styles.notifBadge}>
-                        {notifications.filter((notif) => !notif.isRead).length}
-                      </span>
-                    )}
-                  </div>
-                  {notifications && notifications.filter((notif) => !notif.isRead).length > 0 && (
-                    <div
-                      className={cx(styles.header, styles.markAll)}
-                      onClick={() => !loading && setAllRead()}
-                    >
-                      {loading ? (
-                        <div style={{ marginRight: "12px" }}>
-                          <CircularProgress
-                            style={{ color: "white" }}
-                            size={14}
-                          />
-                        </div>
-                      ) : (
-                        <img
-                          src={checkedIcon}
-                          alt="read"
-                          style={{
-                            marginRight: "8px",
-                            width: "14px",
-                            height: "14px",
-                          }}
-                        />
-                      )}
-                      Mark all notifications as read
-                    </div>
+            <div className={cx(styles.header, styles.mobileHeading)}>
+              <div>
+                NOTIFICATIONS{" "}
+                {notifications &&
+                  notifications.filter((notif) => !notif.isRead).length > 0 && (
+                    <span className={styles.notifBadge}>
+                      {notifications.filter((notif) => !notif.isRead).length}
+                    </span>
                   )}
-                </div>
-                <div style={{ marginTop: "32px" }}>
-                  {notifications?.map((notification) => (
-                    <NotificationItem notification={notification} />
-                  ))}
-                </div>
+              </div>
+              {notifications &&
+                notifications.filter((notif) => !notif.isRead).length > 0 && (
+                  <div
+                    className={cx(styles.header, styles.markAll)}
+                    onClick={() => !loading && setAllRead()}
+                  >
+                    {loading ? (
+                      <div style={{ marginRight: "12px" }}>
+                        <CircularProgress
+                          style={{ color: "white" }}
+                          size={14}
+                        />
+                      </div>
+                    ) : (
+                      <img
+                        src={checkedIcon}
+                        alt="read"
+                        style={{
+                          marginRight: "8px",
+                          width: "14px",
+                          height: "14px",
+                        }}
+                      />
+                    )}
+                    Mark all notifications as read
+                  </div>
+                )}
+            </div>
+            <div style={{ marginTop: "32px" }}>
+              {notifications?.map((notification) => (
+                <NotificationItem notification={notification} />
+              ))}
+            </div>
           </div>
           <div className={styles.rightColumn}>
             <MyTasksView match={match} />

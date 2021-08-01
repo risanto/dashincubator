@@ -5,11 +5,9 @@ import searchIcon from "../Tasks/images/search.svg";
 import caretDown from "../Tasks/images/caretDown.svg";
 import { getCompletedTasks } from "../../api/tasksApi";
 import { CircularProgress } from "@material-ui/core";
-import useOutsideAlerter, {
-  taskTypes,
-  truncate,
-  Breakpoints,
-} from "../../utils/utils";
+import useOutsideAlerter, { taskTypes, truncate } from "../../utils/utils";
+import { Breakpoints } from "../../utils/breakpoint";
+
 import moment from "moment";
 import UserAvatar from "../../components/UserAvatar";
 import PayoutTaskView from "../PayoutTask";

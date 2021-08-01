@@ -18,7 +18,8 @@ import EditTaskView from "../views/EditTask";
 import ReviewJobView from "../views/ReviewJob";
 
 import moment from "moment";
-import { longhandRelative, Breakpoints } from "../utils/utils";
+import { longhandRelative } from "../utils/utils";
+import { Breakpoints } from "../utils/breakpoint";
 import { useHistory } from "react-router";
 import { BountyLocation } from "../Locations";
 import { createUseStyles } from "react-jss";
