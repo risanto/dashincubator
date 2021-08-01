@@ -4,7 +4,8 @@ import FadeIn from "react-fade-in";
 
 import { fetchOpenTasks } from "../../api/tasksApi";
 import { createUseStyles } from "react-jss";
-import useOutsideAlerter, { taskTypes, Breakpoints } from "../../utils/utils";
+import useOutsideAlerter, { taskTypes } from "../../utils/utils";
+import { Breakpoints } from "../../utils/breakpoint";
 import TaskListCard from "../../components/TaskListCard";
 
 import caretDownIcon from "./images/caretDown.svg";
@@ -108,7 +109,7 @@ const useStyles = createUseStyles({
     container: {
       maxWidth: "1050px",
       margin: "auto",
-      padding: "0 88px",
+      padding: "0 88px 24px 88px",
       marginTop: "32px",
       color: "#0B0F3B",
     },
