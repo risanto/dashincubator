@@ -13,10 +13,33 @@ const notificationsCollection = getTable("notifications");
 router.get(
   "/get/:id",
   ...noAuthHandlers(async (req, res) => {
-    const result = await tasksCollection.findOne({
-      _id: ObjectID(req.params.id),
-    });
-    res.send(result);
+    const result = await tasksCollection
+      .aggregate([
+        {
+          $match: {
+            _id: ObjectID(req.params.id),
+          },
+        },
+        // Look for comments based on taskID
+        {
+          $lookup: {
+            from: "activity",
+            let: { taskID: "$_id" },
+            pipeline: [
+              { $match: { $expr: { $eq: ["$taskID", "$$taskID"] } } },
+              { $sort: { date: -1 } },
+            ],
+            as: "comments",
+          },
+        },
+        {
+          $sort: {
+            dateCreated: -1,
+          },
+        },
+      ])
+      .toArray();
+    res.send(result[0]);
   })
 );
 
@@ -127,7 +150,7 @@ router.get(
             $in: [req.tokenPayload._id, ObjectID(req.tokenPayload._id)],
           },
           requests: { $exists: true, $not: { $size: 0 } },
-          assignee: null
+          assignee: null,
         })
         .toArray());
 
