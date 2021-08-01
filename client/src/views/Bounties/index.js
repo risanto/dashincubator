@@ -242,7 +242,7 @@ const useStyles = createUseStyles({
     borderRadius: 3,
     marginRight: 8,
   },
-  [`@media (min-width: ${Breakpoints.lg}px)`]: {
+  [`@media (min-width: ${Breakpoints.md}px)`]: {
     container: {
       maxWidth: 1600,
       margin: "auto",
