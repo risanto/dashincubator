@@ -113,14 +113,6 @@ const useStyles = createUseStyles({
   },
   [`@media (min-width: ${Breakpoints.sm}px)`]: {
     textContainer: { flexShrink: 0, maxWidth: "516px", marginBottom: "16px" },
-    container: {
-      maxWidth: "1050px",
-      margin: "auto",
-      padding: "0 88px",
-      marginTop: "32px",
-      color: "#222",
-      paddingBottom: "88px",
-    },
     title: {
       marginLeft: "12px",
       color: "white",
@@ -138,6 +130,16 @@ const useStyles = createUseStyles({
       borderRadius: "4px",
     },
     rightColumn: { marginLeft: "8px", width: "323px" },
+  },
+  [`@media (min-width: ${Breakpoints.lg}px)`]: {
+    container: {
+      maxWidth: 1600,
+      margin: "auto",
+      padding: "0 88px",
+      marginTop: 32,
+      color: "#0B0F3B",
+      paddingBottom: "88px",
+    },
   },
 });
 

@@ -23,7 +23,7 @@ const useStyles = createUseStyles({
     maxWidth: "100vw",
     margin: "auto",
     padding: "0 24px",
-    marginTop: "32px",
+    marginTop: 32,
     color: "#0B0F3B",
     paddingBottom: "64px",
   },
@@ -110,12 +110,12 @@ const useStyles = createUseStyles({
     userSelect: "none",
     marginBottom: "8px",
   },
-  [`@media (min-width: ${Breakpoints.sm}px)`]: {
+  [`@media (min-width: ${Breakpoints.lg}px)`]: {
     container: {
-      maxWidth: "1050px",
+      maxWidth: 1600,
       margin: "auto",
       padding: "0 88px",
-      marginTop: "32px",
+      marginTop: 32,
       color: "#0B0F3B",
       paddingBottom: "64px",
     },
