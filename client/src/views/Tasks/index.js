@@ -18,7 +18,7 @@ const useStyles = createUseStyles({
     maxWidth: "100vw",
     margin: "auto",
     padding: "0 24px",
-    marginTop: "32px",
+    marginTop: 32,
     color: "#0B0F3B",
   },
   searchInput: {
@@ -40,12 +40,15 @@ const useStyles = createUseStyles({
     boxSizing: "border-box",
   },
   columnHeader: {
-    fontWeight: 600,
     color: "rgba(255, 255, 255, 0.8)",
-    fontSize: "12px",
-    lineHeight: "15px",
+    fontWeight: 600,
     letterSpacing: "0.1em",
-    userSelect: "none",
+    fontSize: 12,
+    lineHeight: "15px",
+    display: "flex",
+    marginTop: 18,
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   requestCTA: {
     marginTop: "16px",
@@ -105,13 +108,14 @@ const useStyles = createUseStyles({
     marginTop: "24px",
     width: "160px",
   },
-  [`@media (min-width: ${Breakpoints.sm}px)`]: {
+  [`@media (min-width: ${Breakpoints.lg}px)`]: {
     container: {
-      maxWidth: "1050px",
+      maxWidth: 1600,
       margin: "auto",
-      padding: "0 88px 24px 88px",
-      marginTop: "32px",
+      padding: "0 88px",
+      marginTop: 32,
       color: "#0B0F3B",
+      paddingBottom: "64px",
     },
   },
 });
@@ -177,10 +181,7 @@ export default function TasksView({ match }) {
                   width: "100%",
                 }}
               >
-                <div
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                >
-                  <div className={styles.columnHeader}>OPEN TASKS</div>
+                <div className={styles.columnHeader}>OPEN TASKS
                   <div
                     className={styles.filterContainer}
                     onClick={() => setSearchingTypes(true)}
