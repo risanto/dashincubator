@@ -154,16 +154,17 @@ const useStyles = createUseStyles({
       borderRadius: "4px",
     },
     valueProposition: { flexShrink: 0, maxWidth: "400px" },
-
+    rightColumn: { marginLeft: "8px", width: "323px", marginTop: "0px" },
+  },
+  [`@media (min-width: ${Breakpoints.lg}px)`]: {
     container: {
-      maxWidth: "1050px",
+      maxWidth: 1600,
       margin: "auto",
       padding: "0 88px",
-      marginTop: "32px",
-      color: "#222",
+      marginTop: 32,
+      color: "#0B0F3B",
       paddingBottom: "88px",
     },
-    rightColumn: { marginLeft: "8px", width: "323px", marginTop: "0px" },
   },
 });
 
